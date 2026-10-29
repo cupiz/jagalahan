@@ -1,26 +1,26 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Jaga Lahan — Design Tokens (docs/DESIGN_SYSTEM.md)
-   Kontras tinggi untuk sinar matahari, palet non-menghakimi,
-   zona air gambut: Warna + Ikon + Pola + Label.
+   JagaLahan v2 — Modern Startup Design System
+   Terinspirasi dari FinTrack (Smart Scanner, Check-in, Koin,
+   Target Impian) dengan tema Emerald–Teal Pencegahan Karhutla
    ============================================================ */
 
 @theme {
-  --color-gambut: #1b5e3a;
-  --color-gambut-700: #164d30;
-  --color-gambut-900: #0f3a23;
-  --color-tunas: #e3f2ea;
-  --color-kertas: #f8faf7;
-  --color-arang: #14261c;
+  --color-gambut: #059669;
+  --color-gambut-700: #047857;
+  --color-gambut-900: #064e3b;
+  --color-tunas: #ecfdf5;
+  --color-kertas: #f8fafc;
+  --color-arang: #0f172a;
   --color-kabut: #64748b;
 
   --color-aman: #0d9488;
   --color-aman-bg: #ccfbf1;
   --color-waspada: #d97706;
   --color-waspada-bg: #fef3c7;
-  --color-bahaya: #c2410c;
-  --color-bahaya-bg: #ffedd5;
+  --color-bahaya: #e11d48;
+  --color-bahaya-bg: #ffe4e6;
 }
 
 @theme inline {
@@ -28,24 +28,42 @@
 }
 
 html {
+  scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background: #e7ede8;
-  color: var(--color-arang);
+  background: #f8fafc;
+  color: #0f172a;
 }
 
-/* Pola latar zona (aksesibilitas buta warna) */
-.pattern-aman {
-  background-image: repeating-linear-gradient(0deg, transparent 0 9px, rgba(13, 148, 136, 0.16) 9px 11px);
+.glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
-.pattern-waspada {
-  background-image: repeating-linear-gradient(45deg, transparent 0 8px, rgba(217, 119, 6, 0.2) 8px 10px);
+
+.text-gradient {
+  background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #2563eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-.pattern-bahaya {
-  background-image: radial-gradient(rgba(194, 65, 12, 0.28) 1.6px, transparent 1.8px);
-  background-size: 8px 8px;
+
+.glow-effect {
+  box-shadow: 0 0 55px -12px rgba(5, 150, 105, 0.28);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -53,13 +71,4 @@ body {
 }
 .no-scrollbar {
   scrollbar-width: none;
-}
-
-@keyframes chop {
-  0%, 100% { transform: rotate(-18deg); }
-  50% { transform: rotate(22deg); }
-}
-.animate-chop {
-  animation: chop 0.9s ease-in-out infinite;
-  transform-origin: 80% 90%;
 }

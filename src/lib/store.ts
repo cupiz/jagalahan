@@ -1,535 +1,435 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import {
-  DEFAULT_PRICE_REF,
-  ROLE_PERSONA,
-  SEED_EQUIPMENT_REQUESTS,
-  SEED_POST_FIRE_OBS,
-  SEED_SMOKE_REPORTS,
-  VILLAGES,
-} from "@/lib/data/seed";
-import { MAX_IGNORED } from "@/lib/reminders";
-import type {
-  AuditLog,
-  Commitment,
-  EquipmentRequest,
-  EquipmentStatus,
-  Harvest,
-  PhotoRecord,
-  PostFireObservation,
-  PriceRef,
-  Profile,
-  Role,
-  SmokeReport,
-  SmokeStatus,
-  StageProgress,
-  StageSlug,
-  SyncOp,
-  VerificationDecision,
-  VisitQueueItem,
-  WaterLog,
-} from "@/lib/types";
-import { addDays, isoDaysFromToday, todayIso, uid } from "@/lib/utils";
+import { todayIso, uid } from "@/lib/utils";
 
 /**
- * Penyimpanan lokal offline-first (localStorage) dengan antrean sinkronisasi ke Supabase.
- * Seluruh data tetap bisa dipakai tanpa sinyal; operasi tulis dicatat di syncQueue.
+ * JagaLahan v2 Store — Penyimpanan lokal interaktif untuk:
+ * 1. Tracking Lahan Tanpa Bakar (Manfaat & Biaya Kelola) + Unduh Laporan PDF
+ * 2. Smart Land & Smoke Scanner (AI Kamera Pemindai Lahan/Semak/Asap)
+ * 3. Check-in Harian Bebas Api, Streak, & JagaLahan Coins (Koin Hijau + Tukar Reward)
+ * 4. Pengingat Siaga Karhutla & Jadwal Lahan
+ * 5. Target Lahan Impian (Goal Setting & Progress Bar)
+ * 6. Level Pengguna & Paket Langganan (Trial 14 Hari, Pro, VIP)
  */
 
-export const STAGE_SLUGS: StageSlug[] = [
-  "penilaian",
-  "pencacahan",
-  "penumpukan",
-  "pengomposan",
-  "kesiapan",
-  "penanaman",
-];
+export type PlanTier = "trial" | "pro" | "vip";
+export type TxType = "manfaat" | "biaya";
+export type TxCategory =
+  | "Kompos & Mulsa"
+  | "Hemat Pupuk"
+  | "Tebas & Cacah"
+  | "Bantuan & Insentif"
+  | "Sekat Kanal & Air"
+  | "Lainnya";
 
-export interface AppState {
-  version: number;
-  onboarded: boolean;
-  consent: boolean;
-  profile: Profile;
-  commitments: Commitment[];
-  stages: StageProgress[];
-  currentStage: number;
-  waterLogs: WaterLog[];
-  harvests: Harvest[];
-  equipmentRequests: EquipmentRequest[];
-  smokeReports: SmokeReport[];
-  postFireObs: PostFireObservation[];
-  priceRefs: Record<string, PriceRef>;
-  auditLogs: AuditLog[];
-  visitQueue: VisitQueueItem[];
-  verificationDecisions: Record<string, VerificationDecision>;
-  syncQueue: SyncOp[];
-  lastSyncAt: string | null;
+export interface LandTransaction {
+  id: string;
+  title: string;
+  category: TxCategory;
+  type: TxType;
+  amount: number;
+  date: string;
+  note?: string;
+  fromScanner?: boolean;
 }
 
-const STORAGE_KEY = "jagalahan:v1";
+export interface LandReminder {
+  id: string;
+  title: string;
+  subtitle: string;
+  timeOrDate: string;
+  kind: "harian" | "musiman" | "siaga_asap";
+  enabled: boolean;
+  doneToday?: boolean;
+}
 
-export function createInitialState(): AppState {
+export interface DreamTarget {
+  id: string;
+  title: string;
+  subtitle: string;
+  targetAmount: number;
+  savedAmount: number;
+  monthlySaving: number;
+  deadline: string;
+  icon: "chopper" | "pump" | "seeds";
+}
+
+export interface RewardRedemption {
+  id: string;
+  title: string;
+  coinsUsed: number;
+  rupiahValue: number;
+  date: string;
+}
+
+export interface ScanRecord {
+  id: string;
+  landCondition: string;
+  fireRisk: "Aman (Lembap)" | "Waspada (Agak Kering)" | "Bahaya (Rawan Api)";
+  waterDepthCm: number;
+  estimatedCompostKg: number;
+  estimatedFertilizerSavedRp: number;
+  recommendation: string;
+  scannedAt: string;
+  photoDataUrl?: string;
+  exifStripped: true;
+}
+
+export interface JagaLahanV2State {
+  userName: string;
+  villageName: string;
+  landAreaHa: number;
+  plan: PlanTier;
+  privacyMask: boolean;
+  darkMode: boolean;
+  coins: number;
+  streakDays: number;
+  lastCheckInDate: string | null;
+  transactions: LandTransaction[];
+  reminders: LandReminder[];
+  targets: DreamTarget[];
+  redemptions: RewardRedemption[];
+  scans: ScanRecord[];
+}
+
+const STORAGE_KEY = "jagalahan:v2";
+
+export function createInitialV2State(): JagaLahanV2State {
   return {
-    version: 1,
-    onboarded: false,
-    consent: false,
-    profile: {
-      id: "me",
-      displayName: ROLE_PERSONA.pekebun_primer,
-      role: "pekebun_primer",
-      villageId: "kalampangan",
-      soil: "gambut",
-      areaHa: 2,
-      nextPlantingDate: isoDaysFromToday(13),
-      ignoredReminders: 0,
-      remindersPaused: false,
-    },
-    commitments: [],
-    stages: STAGE_SLUGS.map((slug, i) => ({
-      stage: i + 1,
-      slug,
-      status: "belum",
-      mulchFlipped: false,
-      verified: false,
-    })),
-    currentStage: 1,
-    waterLogs: [
-      { id: "w-seed-1", date: isoDaysFromToday(-21), depthCm: 24, canalClosed: false, penyuluhContacted: false },
-      { id: "w-seed-2", date: isoDaysFromToday(-7), depthCm: 36, canalClosed: false, penyuluhContacted: false },
-    ],
-    harvests: [
+    userName: "Iqbal",
+    villageName: "Desa Kalampangan, Palangka Raya",
+    landAreaHa: 2.0,
+    plan: "vip",
+    privacyMask: false,
+    darkMode: false,
+    coins: 1250,
+    streakDays: 12,
+    lastCheckInDate: null,
+    transactions: [
       {
-        id: "h-seed-1",
-        season: "Musim 2025",
-        commodity: "Jagung",
-        areaHa: 2,
-        tonPerHa: 3.8,
-        sacks: 152,
-        revenue: 34_960_000,
-        cost: 15_200_000,
-        zeroBurn: false,
+        id: "tx-1",
+        title: "Penghematan Pupuk NPK dari Mulsa Tanpa Bakar (2 Ha)",
+        category: "Hemat Pupuk",
+        type: "manfaat",
+        amount: 3_500_000,
+        date: "2026-10-28",
+        note: "Unsur hara nitrogen terjaga karena semak tidak dibakar",
       },
       {
-        id: "h-seed-2",
-        season: "Musim 2026",
-        commodity: "Jagung",
-        areaHa: 2,
-        tonPerHa: 4.4,
-        sacks: 176,
-        revenue: 40_480_000,
-        cost: 13_900_000,
-        zeroBurn: true,
+        id: "tx-2",
+        title: "Nilai Kompos Organik Hasil Cacahan Semak (450 Kg)",
+        category: "Kompos & Mulsa",
+        type: "manfaat",
+        amount: 1_500_000,
+        date: "2026-10-25",
+        fromScanner: true,
       },
-    ],
-    equipmentRequests: SEED_EQUIPMENT_REQUESTS,
-    smokeReports: SEED_SMOKE_REPORTS,
-    postFireObs: SEED_POST_FIRE_OBS,
-    priceRefs: Object.fromEntries(VILLAGES.map((v) => [v.id, DEFAULT_PRICE_REF])),
-    auditLogs: [
       {
-        id: "a-seed-1",
-        actor: "Mas Yudi (Penyuluh)",
-        action: "Memperbarui acuan harga kalkulator",
-        scope: "calculator_price_refs",
-        at: "2026-09-15T09:00:00+07:00",
+        id: "tx-3",
+        title: "Upah Tebas & Cacah Semak Ringan",
+        category: "Tebas & Cacah",
+        type: "biaya",
+        amount: 450_000,
+        date: "2026-10-22",
+      },
+      {
+        id: "tx-4",
+        title: "Kapur Dolomit & Dekomposer EM4",
+        category: "Kompos & Mulsa",
+        type: "biaya",
+        amount: 200_000,
+        date: "2026-10-20",
+      },
+      {
+        id: "tx-5",
+        title: "Perawatan Pintu Sekat Kanal & Tongkat Air",
+        category: "Sekat Kanal & Air",
+        type: "biaya",
+        amount: 100_000,
+        date: "2026-10-18",
       },
     ],
-    visitQueue: [],
-    verificationDecisions: {},
-    syncQueue: [],
-    lastSyncAt: null,
+    reminders: [
+      {
+        id: "rem-1",
+        title: "Catat kondisi lahan & bebas api harian",
+        subtitle: "Jangan lupa pastikan kebun bebas api & puntung rokok hari ini ya!",
+        timeOrDate: "16:30",
+        kind: "harian",
+        enabled: true,
+      },
+      {
+        id: "rem-2",
+        title: "Jadwal Balik Mulsa Kompos (Hari ke-10)",
+        subtitle: "Saatnya membalik tumpukan serasah agar cepat menjadi kompos subur",
+        timeOrDate: "25 Okt 2026",
+        kind: "musiman",
+        enabled: true,
+      },
+      {
+        id: "rem-3",
+        title: "Siaga Cuaca Panas & Kering BMKG",
+        subtitle: "Pastikan sekat kanal tertutup rapat & tinggi air gambut tetap ≤ 40 cm",
+        timeOrDate: "28 Okt 2026",
+        kind: "siaga_asap",
+        enabled: true,
+      },
+    ],
+    targets: [
+      {
+        id: "tgt-1",
+        title: "Mesin Pencacah Semak Pribadi",
+        subtitle: "Ayo terus kumpulkan penghematan tanpa bakar, alat impianmu pasti tercapai!",
+        targetAmount: 8_000_000,
+        savedAmount: 5_200_000,
+        monthlySaving: 500_000,
+        deadline: "Desember 2026",
+        icon: "chopper",
+      },
+      {
+        id: "tgt-2",
+        title: "Pompa Air & Pipa Siaga Kemarau",
+        subtitle: "Cadangan pembasahan lahan gambut saat puncak kemarau El Niño",
+        targetAmount: 4_000_000,
+        savedAmount: 1_600_000,
+        monthlySaving: 300_000,
+        deadline: "Maret 2027",
+        icon: "pump",
+      },
+      {
+        id: "tgt-3",
+        title: "Bibit Unggul & Pupuk Organik Musim Depan",
+        subtitle: "Modal tanam mandiri dari hasil penghematan pembukaan lahan tanpa bakar",
+        targetAmount: 10_000_000,
+        savedAmount: 3_000_000,
+        monthlySaving: 700_000,
+        deadline: "Juni 2027",
+        icon: "seeds",
+      },
+    ],
+    redemptions: [
+      {
+        id: "red-1",
+        title: "Voucher Bibit Penutup Tanah & Dekomposer EM4",
+        coinsUsed: 1000,
+        rupiahValue: 10_000,
+        date: "2026-10-15",
+      },
+    ],
+    scans: [
+      {
+        id: "scan-1",
+        landCondition: "Semak Belukar Gambut Sedang (2,0 Ha)",
+        fireRisk: "Aman (Lembap)",
+        waterDepthCm: 28,
+        estimatedCompostKg: 450,
+        estimatedFertilizerSavedRp: 1_500_000,
+        recommendation: "Tebas & cacah 10–20 cm, susun di jalur rumpuk, taburkan dolomit.",
+        scannedAt: "2026-10-25 14:23",
+        exifStripped: true,
+      },
+    ],
   };
 }
 
-/* ------------------------------------------------------------------ */
-/* Inti store                                                          */
-/* ------------------------------------------------------------------ */
-
-const serverSnapshot = createInitialState();
-let state: AppState | null = null;
+const serverSnapshot = createInitialV2State();
+let currentState: JagaLahanV2State | null = null;
 const listeners = new Set<() => void>();
 
-function load(): AppState {
-  if (state) return state;
+function loadState(): JagaLahanV2State {
+  if (currentState) return currentState;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    state = raw ? { ...createInitialState(), ...(JSON.parse(raw) as Partial<AppState>) } : createInitialState();
+    currentState = raw
+      ? { ...createInitialV2State(), ...(JSON.parse(raw) as Partial<JagaLahanV2State>) }
+      : createInitialV2State();
   } catch {
-    state = createInitialState();
+    currentState = createInitialV2State();
   }
-  return state;
+  return currentState;
 }
 
-function persist(next: AppState) {
+function saveState(next: JagaLahanV2State) {
+  currentState = next;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  } catch (err) {
-    console.warn("[JagaLahan] Penyimpanan lokal penuh/tidak tersedia:", err);
+  } catch {
+    /* ignore quota errors */
   }
-}
-
-export function getState(): AppState {
-  return typeof window === "undefined" ? serverSnapshot : load();
-}
-
-export function setState(updater: (s: AppState) => AppState) {
-  const next = updater(load());
-  state = next;
-  persist(next);
   listeners.forEach((l) => l());
 }
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
-  const onStorage = (e: StorageEvent) => {
-    if (e.key === STORAGE_KEY) {
-      state = null;
-      listener();
-    }
-  };
-  window.addEventListener("storage", onStorage);
-  return () => {
-    listeners.delete(listener);
-    window.removeEventListener("storage", onStorage);
-  };
+  return () => listeners.delete(listener);
 }
 
-export function useAppState(): AppState {
-  return useSyncExternalStore(subscribe, getState, () => serverSnapshot);
-}
-
-/** true setelah hidrasi selesai (data localStorage sudah terbaca). */
-export function useHydrated(): boolean {
+export function useV2State(): JagaLahanV2State {
   return useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
+    subscribe,
+    () => (typeof window === "undefined" ? serverSnapshot : loadState()),
+    () => serverSnapshot,
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Helper                                                              */
-/* ------------------------------------------------------------------ */
+/* -------------------------------------------------------------------------- */
+/* Actions                                                                     */
+/* -------------------------------------------------------------------------- */
 
-function withSync(s: AppState, table: string, payload: Record<string, unknown>): AppState {
-  return {
+export function setPlanTier(plan: PlanTier) {
+  saveState({ ...loadState(), plan });
+}
+
+export function togglePrivacyMask() {
+  const s = loadState();
+  saveState({ ...s, privacyMask: !s.privacyMask });
+}
+
+export function toggleDarkMode() {
+  const s = loadState();
+  const nextDark = !s.darkMode;
+  if (typeof document !== "undefined") {
+    document.documentElement.classList.toggle("dark", nextDark);
+  }
+  saveState({ ...s, darkMode: nextDark });
+}
+
+export function updateUserProfile(patch: Partial<Pick<JagaLahanV2State, "userName" | "villageName" | "landAreaHa">>) {
+  saveState({ ...loadState(), ...patch });
+}
+
+export function addTransaction(tx: Omit<LandTransaction, "id">) {
+  const s = loadState();
+  const entry: LandTransaction = { ...tx, id: uid("tx") };
+  saveState({
     ...s,
-    syncQueue: [...s.syncQueue, { id: uid("op"), table, payload, createdAt: new Date().toISOString() }],
+    coins: s.coins + 5, // +5 koin untuk pencatatan rutin
+    transactions: [entry, ...s.transactions],
+  });
+}
+
+export function deleteTransaction(id: string) {
+  const s = loadState();
+  saveState({ ...s, transactions: s.transactions.filter((t) => t.id !== id) });
+}
+
+export function performDailyCheckIn(): { ok: boolean; bonusCoins: number; message: string } {
+  const s = loadState();
+  const today = todayIso();
+  if (s.lastCheckInDate === today) {
+    return { ok: false, bonusCoins: 0, message: "Kamu sudah Check-in hari ini! Kembali lagi besok ya 🌱" };
+  }
+  const nextStreak = s.streakDays + 1;
+  const milestoneBonus = nextStreak % 7 === 0 ? 25 : 0;
+  const earned = 10 + milestoneBonus;
+  saveState({
+    ...s,
+    coins: s.coins + earned,
+    streakDays: nextStreak,
+    lastCheckInDate: today,
+  });
+  return {
+    ok: true,
+    bonusCoins: earned,
+    message:
+      milestoneBonus > 0
+        ? `Check-in Hari ke-${nextStreak} berhasil! +10 Koin + Bonus Streak ${milestoneBonus} Koin!`
+        : `Check-in berhasil! Kamu mendapatkan +10 Koin Hijau (Streak ${nextStreak} hari).`,
   };
 }
 
-function withAudit(s: AppState, action: string, scope: string): AppState {
-  return {
+export function redeemCoins(title: string, coinsCost = 1000, rupiahValue = 10_000): boolean {
+  const s = loadState();
+  if (s.coins < coinsCost) return false;
+  saveState({
     ...s,
-    auditLogs: [
-      { id: uid("audit"), actor: s.profile.displayName, action, scope, at: new Date().toISOString() },
-      ...s.auditLogs,
+    coins: s.coins - coinsCost,
+    redemptions: [
+      { id: uid("red"), title, coinsUsed: coinsCost, rupiahValue, date: todayIso() },
+      ...s.redemptions,
     ],
-  };
+  });
+  return true;
 }
 
-/* ------------------------------------------------------------------ */
-/* Aksi: profil & onboarding                                           */
-/* ------------------------------------------------------------------ */
-
-export function completeOnboarding(patch: Partial<Profile>) {
-  setState((s) => ({ ...s, onboarded: true, consent: true, profile: { ...s.profile, ...patch } }));
-}
-
-export function updateProfile(patch: Partial<Profile>) {
-  setState((s) => ({ ...s, profile: { ...s.profile, ...patch } }));
-}
-
-export function switchRole(role: Role) {
-  setState((s) => ({
+export function addReminder(rem: Omit<LandReminder, "id" | "enabled">) {
+  const s = loadState();
+  saveState({
     ...s,
-    profile: {
-      ...s.profile,
-      role,
-      displayName: ROLE_PERSONA[role],
-      soil: role === "petani_sekunder" ? "mineral" : s.profile.soil === "mineral" && role === "pekebun_primer" ? "gambut" : s.profile.soil,
-    },
-  }));
+    reminders: [{ ...rem, id: uid("rem"), enabled: true }, ...s.reminders],
+  });
 }
 
-export function resetAllData() {
+export function toggleReminder(id: string) {
+  const s = loadState();
+  saveState({
+    ...s,
+    reminders: s.reminders.map((r) => (r.id === id ? { ...r, enabled: !r.enabled } : r)),
+  });
+}
+
+export function deleteReminder(id: string) {
+  const s = loadState();
+  saveState({ ...s, reminders: s.reminders.filter((r) => r.id !== id) });
+}
+
+export function addSavingToTarget(id: string, amount: number) {
+  const s = loadState();
+  saveState({
+    ...s,
+    coins: s.coins + 10,
+    targets: s.targets.map((t) =>
+      t.id === id ? { ...t, savedAmount: Math.min(t.targetAmount, t.savedAmount + amount) } : t,
+    ),
+  });
+}
+
+export function addDreamTarget(target: Omit<DreamTarget, "id">) {
+  const s = loadState();
+  saveState({
+    ...s,
+    targets: [{ ...target, id: uid("tgt") }, ...s.targets],
+  });
+}
+
+export function saveScanResult(scan: Omit<ScanRecord, "id" | "scannedAt" | "exifStripped">) {
+  const s = loadState();
+  const entry: ScanRecord = {
+    ...scan,
+    id: uid("scan"),
+    scannedAt: new Date().toLocaleString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    exifStripped: true,
+  };
+  const autoTx: LandTransaction = {
+    id: uid("tx"),
+    title: `[Smart Scanner] ${scan.landCondition} — Potensi Kompos ${scan.estimatedCompostKg} Kg`,
+    category: "Kompos & Mulsa",
+    type: "manfaat",
+    amount: scan.estimatedFertilizerSavedRp,
+    date: todayIso(),
+    note: scan.recommendation,
+    fromScanner: true,
+  };
+  saveState({
+    ...s,
+    coins: s.coins + 15,
+    scans: [entry, ...s.scans],
+    transactions: [autoTx, ...s.transactions],
+  });
+}
+
+export function resetV2Data() {
   try {
     window.localStorage.removeItem(STORAGE_KEY);
   } catch {
-    /* abaikan */
+    /* ignore */
   }
-  state = createInitialState();
-  listeners.forEach((l) => l());
+  saveState(createInitialV2State());
 }
-
-/* ------------------------------------------------------------------ */
-/* Aksi: pengingat pra-keputusan                                        */
-/* ------------------------------------------------------------------ */
-
-export function ignoreReminder() {
-  setState((s) => {
-    const ignored = Math.min(MAX_IGNORED, s.profile.ignoredReminders + 1);
-    const paused = ignored >= MAX_IGNORED;
-    let next: AppState = { ...s, profile: { ...s.profile, ignoredReminders: ignored, remindersPaused: paused } };
-    // Gambut berisiko tinggi + 3x tanpa respons → antrean kunjungan penyuluh (bukan notifikasi tambahan).
-    if (paused && s.profile.soil === "gambut" && !s.visitQueue.some((v) => v.farmer === s.profile.displayName && !v.done)) {
-      next = {
-        ...next,
-        visitQueue: [
-          {
-            id: uid("visit"),
-            farmer: s.profile.displayName,
-            reason: "3 pengingat pra-musim tidak direspons — lahan gambut berisiko tinggi",
-            at: new Date().toISOString(),
-            done: false,
-          },
-          ...next.visitQueue,
-        ],
-      };
-    }
-    return next;
-  });
-}
-
-export function respondReminder() {
-  setState((s) => ({ ...s, profile: { ...s.profile, ignoredReminders: 0 } }));
-}
-
-export function resumeReminders() {
-  setState((s) => ({ ...s, profile: { ...s.profile, ignoredReminders: 0, remindersPaused: false } }));
-}
-
-/* ------------------------------------------------------------------ */
-/* Aksi: komitmen & panduan 6 tahap                                     */
-/* ------------------------------------------------------------------ */
-
-export function addCommitment(c: Omit<Commitment, "id" | "createdAt" | "status">) {
-  setState((s) => {
-    const commitment: Commitment = { ...c, id: uid("c"), status: "berjalan", createdAt: todayIso() };
-    return withSync({ ...s, commitments: [commitment, ...s.commitments] }, "season_commitments", { ...commitment });
-  });
-}
-
-export function setCommitmentVisibility(id: string, isPublic: boolean) {
-  setState((s) => ({
-    ...s,
-    commitments: s.commitments.map((c) => (c.id === id ? { ...c, isPublic } : c)),
-  }));
-}
-
-export function setCurrentStage(stage: number) {
-  setState((s) => ({ ...s, currentStage: Math.max(1, Math.min(6, stage)) }));
-}
-
-export function updateStage(stage: number, patch: Partial<StageProgress>) {
-  setState((s) => {
-    const stages = s.stages.map((st) => {
-      if (st.stage !== stage) return st;
-      const next = { ...st, ...patch };
-      if (patch.status === "sedang_dikerjakan" && !st.startedAt) {
-        next.startedAt = todayIso();
-        if (st.slug === "pengomposan") next.mulchFlipDue = addDays(todayIso(), 10);
-      }
-      if (patch.status === "selesai") next.completedAt = todayIso();
-      return next;
-    });
-    const changed = stages.find((st) => st.stage === stage)!;
-    return withSync({ ...s, stages }, "six_stage_progress", {
-      stage_number: changed.stage,
-      stage_slug: changed.slug,
-      status: changed.status,
-      started_at: changed.startedAt ?? null,
-      mulch_flip_due_date: changed.mulchFlipDue ?? null,
-      mulch_flipped: changed.mulchFlipped,
-    });
-  });
-}
-
-export function attachStagePhoto(stage: number, photo: PhotoRecord) {
-  setState((s) => ({ ...s, stages: s.stages.map((st) => (st.stage === stage ? { ...st, photo } : st)) }));
-}
-
-/* ------------------------------------------------------------------ */
-/* Aksi: muka air, panen, bantuan                                       */
-/* ------------------------------------------------------------------ */
-
-export function addWaterLog(log: Omit<WaterLog, "id">) {
-  setState((s) => {
-    const entry: WaterLog = { ...log, id: uid("w") };
-    const waterLogs = [...s.waterLogs.filter((w) => w.date !== log.date), entry].sort((a, b) =>
-      a.date.localeCompare(b.date),
-    );
-    return withSync({ ...s, waterLogs }, "water_table_logs", {
-      measurement_date: entry.date,
-      depth_cm: entry.depthCm,
-      canal_block_closed_action: entry.canalClosed,
-      penyuluh_contacted_action: entry.penyuluhContacted,
-      exif_stripped_verified: true,
-    });
-  });
-}
-
-export function updateWaterLog(id: string, patch: Partial<WaterLog>) {
-  setState((s) => ({ ...s, waterLogs: s.waterLogs.map((w) => (w.id === id ? { ...w, ...patch } : w)) }));
-}
-
-export function addHarvest(h: Omit<Harvest, "id">) {
-  setState((s) => {
-    const entry: Harvest = { ...h, id: uid("h") };
-    return withSync({ ...s, harvests: [...s.harvests, entry] }, "harvest_journals", {
-      season_label: entry.season,
-      commodity: entry.commodity,
-      land_area_ha: entry.areaHa,
-      yield_ton_per_ha: entry.tonPerHa,
-      yield_sacks_count: entry.sacks,
-      gross_revenue_idr: entry.revenue,
-      input_cost_idr: entry.cost,
-      used_zero_burning: entry.zeroBurn,
-    });
-  });
-}
-
-export function removeHarvest(id: string) {
-  setState((s) => ({ ...s, harvests: s.harvests.filter((h) => h.id !== id) }));
-}
-
-export function requestEquipment(r: Pick<EquipmentRequest, "type" | "areaHa" | "costGap">) {
-  setState((s) => {
-    const entry: EquipmentRequest = {
-      ...r,
-      id: uid("eq"),
-      requester: s.profile.displayName,
-      isMine: true,
-      status: "menunggu",
-      createdAt: todayIso(),
-    };
-    return withSync({ ...s, equipmentRequests: [entry, ...s.equipmentRequests] }, "equipment_requests", {
-      request_type: entry.type,
-      land_area_ha: entry.areaHa,
-      estimated_cost_gap_idr: entry.costGap,
-      status: entry.status,
-    });
-  });
-}
-
-/* ------------------------------------------------------------------ */
-/* Aksi: warga penjaga                                                  */
-/* ------------------------------------------------------------------ */
-
-export function addSmokeReport(r: Pick<SmokeReport, "zone" | "intensity" | "wind" | "photo">) {
-  setState((s) => {
-    const entry: SmokeReport = {
-      ...r,
-      id: uid("smoke"),
-      reporter: s.profile.displayName,
-      status: "baru_dilaporkan",
-      reportedAt: new Date().toISOString(),
-    };
-    return withSync({ ...s, smokeReports: [entry, ...s.smokeReports] }, "smoke_reports", {
-      sub_village_zone: entry.zone,
-      smoke_intensity: entry.intensity,
-      wind_direction_note: entry.wind,
-      status: entry.status,
-      exif_stripped_verified: true,
-    });
-  });
-}
-
-export function addPostFireObservation(o: Omit<PostFireObservation, "id" | "observedAt">) {
-  setState((s) => ({
-    ...s,
-    postFireObs: [
-      ...s.postFireObs.filter((x) => !(x.plotId === o.plotId && x.month === o.month)),
-      { ...o, id: uid("obs"), observedAt: todayIso() },
-    ],
-  }));
-}
-
-/* ------------------------------------------------------------------ */
-/* Aksi: penyuluh tersier (semua tercatat di audit log)                 */
-/* ------------------------------------------------------------------ */
-
-export function decideVerification(id: string, decision: VerificationDecision, label: string) {
-  setState((s) =>
-    withAudit(
-      { ...s, verificationDecisions: { ...s.verificationDecisions, [id]: decision } },
-      `${decision === "diverifikasi" ? "Memverifikasi" : "Menjadwalkan kunjungan untuk"} ${label}`,
-      "six_stage_progress",
-    ),
-  );
-}
-
-export function verifyOwnStage(stage: number) {
-  setState((s) =>
-    withAudit(
-      { ...s, stages: s.stages.map((st) => (st.stage === stage ? { ...st, verified: true } : st)) },
-      `Memverifikasi tahap ${stage} milik pengguna demo`,
-      "six_stage_progress",
-    ),
-  );
-}
-
-export function setEquipmentStatus(id: string, status: EquipmentStatus, scheduledDate?: string) {
-  setState((s) =>
-    withAudit(
-      {
-        ...s,
-        equipmentRequests: s.equipmentRequests.map((r) =>
-          r.id === id ? { ...r, status, scheduledDate: scheduledDate ?? r.scheduledDate } : r,
-        ),
-      },
-      `Mengubah status pengajuan alat menjadi "${status}"`,
-      "equipment_requests",
-    ),
-  );
-}
-
-export function setSmokeStatus(id: string, status: SmokeStatus) {
-  setState((s) =>
-    withAudit(
-      { ...s, smokeReports: s.smokeReports.map((r) => (r.id === id ? { ...r, status } : r)) },
-      `Mengubah status laporan asap menjadi "${status}"`,
-      "smoke_reports",
-    ),
-  );
-}
-
-export function updatePriceRef(villageId: string, patch: Partial<PriceRef>) {
-  setState((s) =>
-    withAudit(
-      {
-        ...s,
-        priceRefs: {
-          ...s.priceRefs,
-          [villageId]: { ...s.priceRefs[villageId], ...patch, verifiedBy: s.profile.displayName, updatedAt: todayIso() },
-        },
-      },
-      "Memperbarui acuan harga kalkulator",
-      "calculator_price_refs",
-    ),
-  );
-}
-
-export function completeVisit(id: string) {
-  setState((s) =>
-    withAudit(
-      { ...s, visitQueue: s.visitQueue.map((v) => (v.id === id ? { ...v, done: true } : v)) },
-      "Menandai kunjungan pendampingan selesai",
-      "visit_queue",
-    ),
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Sinkronisasi                                                         */
-/* ------------------------------------------------------------------ */
-
-export function markSynced(ids: string[]) {
-  setState((s) => ({
-    ...s,
-    syncQueue: s.syncQueue.filter((op) => !ids.includes(op.id)),
-    lastSyncAt: new Date().toISOString(),
-  }));
-}
-
