@@ -8,19 +8,38 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://jagalahan.web.id"),
   title: {
-    default: "Jaga Lahan — Buka Lahan Tanpa Bakar",
-    template: "%s | Jaga Lahan",
+    default: "JagaLahan — Smart Land & Zero-Burning Tracker",
+    template: "%s | JagaLahan",
   },
   description:
-    "Aplikasi pendamping petani dan pekebun lahan gambut untuk membuka lahan tanpa bakar: kalkulator biaya, panduan 6 tahap, tongkat ukur muka air tanah, dan kohort desa.",
-  applicationName: "Jaga Lahan",
+    "Platform teknologi persuasif pencegahan Karhutla: AI Smart Land & Smoke Scanner, Tracking Manfaat Tanpa Bakar, Check-in Koin Hijau, Pengingat Siaga, dan Target Lahan Impian.",
+  applicationName: "JagaLahan",
   authors: [{ name: "Iqbal Ahdagita Elbadra" }],
-  icons: { icon: "/icon-192.png", apple: "/icon-192.png" },
+  alternates: {
+    canonical: "https://jagalahan.web.id",
+  },
+  openGraph: {
+    title: "JagaLahan — Smart Land & Zero-Burning Tracker",
+    description:
+      "Kelola lahan tanpa bakar lebih cerdas, terukur nilai rupiahnya, dan bebas kabut asap bersama JagaLahan.",
+    url: "https://jagalahan.web.id",
+    siteName: "JagaLahan",
+    locale: "id_ID",
+    type: "website",
+  },
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1B5E3A",
+  themeColor: "#042f2e",
   width: "device-width",
   initialScale: 1,
 };

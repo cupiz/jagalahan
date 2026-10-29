@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ============================================================
-   JagaLahan v2 — Modern Startup Design System
-   Terinspirasi dari FinTrack (Smart Scanner, Check-in, Koin,
-   Target Impian) dengan tema Emerald–Teal Pencegahan Karhutla
+   JagaLahan — Futuristic Eco-Tech Startup Design System
+   Domain: https://jagalahan.web.id
    ============================================================ */
 
 @theme {
@@ -37,20 +38,82 @@ body {
   color: #0f172a;
 }
 
+html.dark body {
+  background: #020617;
+  color: #f8fafc;
+}
+
+/* Jaminan kontras penuh untuk seluruh elemen form di Light & Dark Mode */
+input,
+select,
+textarea {
+  color: #0f172a;
+  background-color: #ffffff;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+select option {
+  color: #0f172a;
+  background-color: #ffffff;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+  color: #f8fafc;
+  background-color: #1e293b;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+html.dark select option {
+  color: #f8fafc;
+  background-color: #0f172a;
+}
+
 .glass-card {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.glass-dark {
+  background: rgba(6, 24, 19, 0.68);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(52, 211, 153, 0.18);
+}
+
+.futuristic-grid {
+  background-size: 44px 44px;
+  background-image:
+    linear-gradient(to right, rgba(52, 211, 153, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(52, 211, 153, 0.07) 1px, transparent 1px);
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #2563eb 100%);
+  background: linear-gradient(135deg, #34d399 0%, #2dd4bf 45%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-light {
+  background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #0284c7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .glow-effect {
-  box-shadow: 0 0 55px -12px rgba(5, 150, 105, 0.28);
+  box-shadow: 0 0 65px -12px rgba(16, 185, 129, 0.35);
 }
 
 @keyframes float {
@@ -62,8 +125,23 @@ body {
   }
 }
 
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.06);
+  }
+}
+
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 8s ease-in-out infinite;
 }
 
 .no-scrollbar::-webkit-scrollbar {

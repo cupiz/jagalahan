@@ -94,7 +94,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Menu Navigasi */}
         <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
           <div className="mb-2 px-3 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
-            Menu Utama JagaLahan v2
+            Menu Utama JagaLahan
           </div>
           {NAV_ITEMS.map(({ href, label, icon: Icon, badge }) => {
             const active = pathname === href || pathname.startsWith(`${href}/`);
@@ -327,7 +327,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <Dialog
         open={mobileDrawerOpen}
         onOpenChange={setMobileDrawerOpen}
-        title="Menu Lengkap JagaLahan v2"
+        title="Menu Lengkap JagaLahan"
         description="Pilih halaman fitur yang ingin dibuka"
       >
         <div className="space-y-1.5">

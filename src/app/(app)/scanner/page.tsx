@@ -129,7 +129,7 @@ export default function ScannerPage() {
 
   const jsonPreview = {
     status: "success",
-    scanner_engine: "JagaLahan-Vision-v2",
+    scanner_engine: "JagaLahan-Vision-AI",
     privacy_exif_gps_stripped: true,
     extracted_data: {
       kondisi_lahan: landCondition,
@@ -338,7 +338,7 @@ export default function ScannerPage() {
                 <select
                   value={fireRisk}
                   onChange={(e) => setFireRisk(e.target.value as ScanRecord["fireRisk"])}
-                  className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold dark:border-slate-700 dark:bg-slate-800"
+                  className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                 >
                   <option value="Aman (Lembap)">Aman (Lembap)</option>
                   <option value="Waspada (Agak Kering)">Waspada (Agak Kering)</option>
@@ -351,12 +351,12 @@ export default function ScannerPage() {
                   Kedalaman Air Gambut (cm di bawah tanah)
                 </label>
                 <div className="relative mt-1">
-                  <Droplets className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-cyan-600" />
+                  <Droplets className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                   <input
                     type="number"
                     value={waterDepthCm}
                     onChange={(e) => setWaterDepthCm(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 pl-9 pr-3.5 py-2.5 text-sm font-semibold dark:border-slate-700 dark:bg-slate-800"
+                    className="w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                   />
                 </div>
               </div>
@@ -368,12 +368,12 @@ export default function ScannerPage() {
                   Estimasi Biomassa Kompos (Kg)
                 </label>
                 <div className="relative mt-1">
-                  <Sprout className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-emerald-600" />
+                  <Sprout className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                   <input
                     type="number"
                     value={compostKg}
                     onChange={(e) => setCompostKg(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 pl-9 pr-3.5 py-2.5 text-sm font-semibold dark:border-slate-700 dark:bg-slate-800"
+                    className="w-full rounded-xl border border-slate-200 bg-white pl-9 pr-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                   />
                 </div>
               </div>
@@ -387,7 +387,7 @@ export default function ScannerPage() {
                   step={50000}
                   value={savedRp}
                   onChange={(e) => setSavedRp(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-extrabold text-emerald-700 dark:border-slate-700 dark:bg-slate-800 dark:text-emerald-400"
+                  className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-extrabold text-emerald-700 dark:border-slate-700 dark:bg-slate-800 dark:text-emerald-400"
                 />
               </div>
             </div>
@@ -400,7 +400,7 @@ export default function ScannerPage() {
                 rows={3}
                 value={recommendation}
                 onChange={(e) => setRecommendation(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-200 p-3 text-xs leading-relaxed dark:border-slate-700 dark:bg-slate-800"
+                className="mt-1 w-full rounded-xl border border-slate-200 bg-white p-3 text-xs font-medium leading-relaxed text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
               />
             </div>
 

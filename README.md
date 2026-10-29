@@ -1,12 +1,12 @@
-# 🌱 JagaLahan v2 — Aplikasi Pintar Pencegahan Karhutla & Kelola Lahan Tanpa Bakar
+# 🌱 JagaLahan — Aplikasi Pintar Pencegahan Karhutla & Kelola Lahan Tanpa Bakar (`jagalahan.web.id`)
 
-**JagaLahan v2** adalah aplikasi web progresif (*Progressive Web Application*) berbasis **Persuasive Technology** yang dirancang untuk membantu petani, pekebun, dan warga desa rawan Kebakaran Hutan dan Lahan (Karhutla) beralih ke metode **Pembukaan & Pengelolaan Lahan Tanpa Bakar (*Zero-Burning*)** secara mudah, terukur, dan menguntungkan.
+**JagaLahan** adalah aplikasi web progresif (*Progressive Web Application*) berbasis **Persuasive Technology** yang dirancang untuk membantu petani, pekebun, dan warga desa rawan Kebakaran Hutan dan Lahan (Karhutla) beralih ke metode **Pembukaan & Pengelolaan Lahan Tanpa Bakar (*Zero-Burning*)** secara mudah, terukur, dan menguntungkan.
 
 Dirancang oleh **Iqbal Ahdagita Elbadra (NIM: 26MA41D022)** — Program Studi Magister Ilmu Komputer (S2), Universitas Amikom Purwokerto, di bawah bimbingan **Dr. Dhanar Intan Surya Saputra, M.Kom.**
 
 ---
 
-## ✨ 6 Fitur Utama JagaLahan v2
+## ✨ 6 Fitur Utama JagaLahan
 
 1. **Beranda & Ringkasan Nilai Manfaat Tanpa Bakar (`/beranda`)**
    - Menampilkan kartu **Total Nilai Manfaat Tanpa Bakar** (`Rp4.250.000`), perbandingan nilai penghematan pupuk & kompos (`+Rp5.000.000`) terhadap biaya kelola (`-Rp750.000`), *Donut Chart* proporsi manfaat vs biaya, serta tombol sensor **Mode Privasi Nominal** (`Rp •••••••`).

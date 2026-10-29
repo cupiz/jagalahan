@@ -43,7 +43,7 @@ export default function ProfilPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `jagalahan-v2-backup-${state.userName.toLowerCase()}.json`;
+    a.download = `jagalahan-backup-${state.userName.toLowerCase()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -53,7 +53,7 @@ export default function ProfilPage() {
     setUserName("Iqbal");
     setVillageName("Desa Kalampangan, Palangka Raya");
     setLandAreaHa("2");
-    setSavedNotice("Seluruh data aplikasi dikembalikan ke setelan awal demo v2.");
+    setSavedNotice("Seluruh data aplikasi dikembalikan ke setelan awal.");
     setTimeout(() => setSavedNotice(null), 3500);
   };
 
@@ -92,7 +92,7 @@ export default function ProfilPage() {
                 type="text"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold dark:border-slate-700 dark:bg-slate-800"
+                className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
               />
             </div>
 
@@ -104,7 +104,7 @@ export default function ProfilPage() {
                 type="text"
                 value={villageName}
                 onChange={(e) => setVillageName(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold dark:border-slate-700 dark:bg-slate-800"
+                className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
               />
             </div>
 
@@ -118,7 +118,7 @@ export default function ProfilPage() {
                 min="0.5"
                 value={landAreaHa}
                 onChange={(e) => setLandAreaHa(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm font-semibold dark:border-slate-700 dark:bg-slate-800"
+                className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
               />
             </div>
 
@@ -178,7 +178,7 @@ export default function ProfilPage() {
               <div className="rounded-2xl border border-emerald-200/70 bg-emerald-50/50 p-4 text-xs text-emerald-950 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-200">
                 <div className="flex items-center gap-1.5 font-extrabold">
                   <Lock className="h-4 w-4 text-emerald-600" />
-                  <span>Jaminan Privasi JagaLahan v2:</span>
+                  <span>Jaminan Privasi JagaLahan:</span>
                 </div>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-[11px] leading-relaxed">
                   <li>
@@ -212,7 +212,7 @@ export default function ProfilPage() {
                 className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-extrabold text-rose-700 hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-300"
               >
                 <RotateCcw className="h-4 w-4" />
-                Reset Data Demo v2
+                Reset Data Awal
               </button>
             </div>
           </div>
