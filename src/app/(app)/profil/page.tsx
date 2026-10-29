@@ -143,6 +143,7 @@ export default function ProfilPage() {
                 <option value="petani">Petani / Pekebun Lahan</option>
                 <option value="kelompok_tani">Pengurus Kelompok Tani / Koperasi</option>
                 <option value="penyuluh">Penyuluh / Relawan MPA</option>
+                <option value="admin">Super Admin (Administrator Sistem)</option>
               </select>
             </div>
 

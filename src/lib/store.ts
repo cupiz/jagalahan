@@ -16,7 +16,7 @@ import { getSupabase } from "@/lib/supabase/client";
  */
 
 export type PlanTier = "trial" | "pro" | "vip";
-export type UserRole = "petani" | "kelompok_tani" | "penyuluh";
+export type UserRole = "petani" | "kelompok_tani" | "penyuluh" | "admin";
 export type TxType = "manfaat" | "biaya";
 export type TxCategory =
   | "Kompos & Mulsa"
@@ -30,7 +30,22 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   petani: "Petani / Pekebun",
   kelompok_tani: "Pengurus Kelompok Tani",
   penyuluh: "Penyuluh / Relawan MPA",
+  admin: "Super Admin (Administrator)",
 };
+
+export interface ManagedUser {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  villageName: string;
+  landAreaHa: number;
+  plan: PlanTier;
+  coins: number;
+  streakDays: number;
+  status: "Aktif" | "Nonaktif";
+  joinedAt: string;
+}
 
 export interface LandTransaction {
   id: string;
@@ -98,6 +113,7 @@ export interface JagaLahanV2State {
   coins: number;
   streakDays: number;
   lastCheckInDate: string | null;
+  managedUsers: ManagedUser[];
   transactions: LandTransaction[];
   reminders: LandReminder[];
   targets: DreamTarget[];
@@ -123,6 +139,73 @@ export function createInitialV2State(): JagaLahanV2State {
     coins: 1250,
     streakDays: 12,
     lastCheckInDate: null,
+    managedUsers: [
+      {
+        id: "usr-admin",
+        name: "Super Admin JagaLahan",
+        email: "admin@jagalahan.web.id",
+        role: "admin",
+        villageName: "Pusat Komando Karhutla Kalteng",
+        landAreaHa: 50.0,
+        plan: "vip",
+        coins: 9999,
+        streakDays: 30,
+        status: "Aktif",
+        joinedAt: "2026-10-01",
+      },
+      {
+        id: "usr-1",
+        name: "Iqbal",
+        email: "iqbal@jagalahan.web.id",
+        role: "petani",
+        villageName: "Desa Kalampangan, Palangka Raya",
+        landAreaHa: 2.0,
+        plan: "vip",
+        coins: 1250,
+        streakDays: 12,
+        status: "Aktif",
+        joinedAt: "2026-10-10",
+      },
+      {
+        id: "usr-2",
+        name: "Pak Hendra",
+        email: "hendra.poktan@jagalahan.web.id",
+        role: "kelompok_tani",
+        villageName: "Koperasi Tani Sabangau Hijau",
+        landAreaHa: 15.0,
+        plan: "pro",
+        coins: 3400,
+        streakDays: 21,
+        status: "Aktif",
+        joinedAt: "2026-10-12",
+      },
+      {
+        id: "usr-3",
+        name: "Budi Santoso",
+        email: "budi.tani@jagalahan.web.id",
+        role: "petani",
+        villageName: "Desa Tumbang Nusa, Pulang Pisau",
+        landAreaHa: 1.5,
+        plan: "trial",
+        coins: 320,
+        streakDays: 5,
+        status: "Aktif",
+        joinedAt: "2026-10-18",
+      },
+      {
+        id: "usr-4",
+        name: "Siti Aminah",
+        email: "siti.mpa@jagalahan.web.id",
+        role: "penyuluh",
+        villageName: "Posko MPA Gohong, Pulang Pisau",
+        landAreaHa: 8.5,
+        plan: "vip",
+        coins: 2150,
+        streakDays: 19,
+        status: "Aktif",
+        joinedAt: "2026-10-14",
+      },
+    ],
     transactions: [
       {
         id: "tx-1",
@@ -325,23 +408,35 @@ export async function loginUser(params: {
     }
   }
   const s = loadState();
+  const isEmailAdmin = params.email.toLowerCase().includes("admin");
+  const matchedUser = s.managedUsers.find(
+    (u) => u.email.toLowerCase() === params.email.trim().toLowerCase(),
+  );
   const inferredName =
     params.name ||
+    matchedUser?.name ||
+    (isEmailAdmin ? "Super Admin JagaLahan" : "") ||
     params.email
       .split("@")[0]
       .replace(/[._-]/g, " ")
       .replace(/\b\w/g, (c) => c.toUpperCase()) ||
     "Iqbal";
+  const resolvedRole: UserRole =
+    params.role ?? matchedUser?.role ?? (isEmailAdmin ? "admin" : s.userRole);
+  const resolvedPlan: PlanTier =
+    params.plan ?? matchedUser?.plan ?? (isEmailAdmin ? "vip" : s.plan);
 
   saveState({
     ...s,
     isAuthenticated: true,
     userEmail: params.email,
     userName: inferredName,
-    userRole: params.role ?? s.userRole,
-    plan: params.plan ?? s.plan,
-    villageName: params.villageName ?? s.villageName,
-    landAreaHa: params.landAreaHa ?? s.landAreaHa,
+    userRole: resolvedRole,
+    plan: resolvedPlan,
+    villageName: params.villageName ?? matchedUser?.villageName ?? s.villageName,
+    landAreaHa: params.landAreaHa ?? matchedUser?.landAreaHa ?? s.landAreaHa,
+    coins: matchedUser?.coins ?? s.coins,
+    streakDays: matchedUser?.streakDays ?? s.streakDays,
   });
 }
 
@@ -374,15 +469,42 @@ export async function registerUser(params: {
     }
   }
   const s = loadState();
+  const cleanName = params.name.trim() || "Petani JagaLahan";
+  const cleanEmail = params.email.trim() || "petani@jagalahan.web.id";
+  const cleanVillage = params.villageName.trim() || "Desa Kalampangan, Palangka Raya";
+  const cleanArea = params.landAreaHa || 2.0;
+  const cleanPlan = params.plan ?? "trial";
+
+  const exists = s.managedUsers.some((u) => u.email.toLowerCase() === cleanEmail.toLowerCase());
+  const nextUsers: ManagedUser[] = exists
+    ? s.managedUsers
+    : [
+        {
+          id: uid("usr"),
+          name: cleanName,
+          email: cleanEmail,
+          role: params.role,
+          villageName: cleanVillage,
+          landAreaHa: cleanArea,
+          plan: cleanPlan,
+          coins: 100,
+          streakDays: 1,
+          status: "Aktif",
+          joinedAt: todayIso(),
+        },
+        ...s.managedUsers,
+      ];
+
   saveState({
     ...s,
     isAuthenticated: true,
-    userName: params.name.trim() || "Petani JagaLahan",
-    userEmail: params.email.trim() || "petani@jagalahan.web.id",
+    userName: cleanName,
+    userEmail: cleanEmail,
     userRole: params.role,
-    villageName: params.villageName.trim() || "Desa Kalampangan, Palangka Raya",
-    landAreaHa: params.landAreaHa || 2.0,
-    plan: params.plan ?? "trial",
+    villageName: cleanVillage,
+    landAreaHa: cleanArea,
+    plan: cleanPlan,
+    managedUsers: nextUsers,
   });
 }
 
@@ -445,6 +567,14 @@ export function deleteTransaction(id: string) {
   saveState({ ...s, transactions: s.transactions.filter((t) => t.id !== id) });
 }
 
+export function updateTransaction(id: string, patch: Partial<Omit<LandTransaction, "id">>) {
+  const s = loadState();
+  saveState({
+    ...s,
+    transactions: s.transactions.map((t) => (t.id === id ? { ...t, ...patch } : t)),
+  });
+}
+
 export function performDailyCheckIn(): { ok: boolean; bonusCoins: number; message: string } {
   const s = loadState();
   const today = todayIso();
@@ -484,11 +614,43 @@ export function redeemCoins(title: string, coinsCost = 1000, rupiahValue = 10_00
   return true;
 }
 
+export function addRedemption(entry: Omit<RewardRedemption, "id">) {
+  const s = loadState();
+  saveState({
+    ...s,
+    redemptions: [{ ...entry, id: uid("red") }, ...s.redemptions],
+  });
+}
+
+export function updateRedemption(id: string, patch: Partial<Omit<RewardRedemption, "id">>) {
+  const s = loadState();
+  saveState({
+    ...s,
+    redemptions: s.redemptions.map((r) => (r.id === id ? { ...r, ...patch } : r)),
+  });
+}
+
+export function deleteRedemption(id: string) {
+  const s = loadState();
+  saveState({
+    ...s,
+    redemptions: s.redemptions.filter((r) => r.id !== id),
+  });
+}
+
 export function addReminder(rem: Omit<LandReminder, "id" | "enabled">) {
   const s = loadState();
   saveState({
     ...s,
     reminders: [{ ...rem, id: uid("rem"), enabled: true }, ...s.reminders],
+  });
+}
+
+export function updateReminder(id: string, patch: Partial<Omit<LandReminder, "id">>) {
+  const s = loadState();
+  saveState({
+    ...s,
+    reminders: s.reminders.map((r) => (r.id === id ? { ...r, ...patch } : r)),
   });
 }
 
@@ -524,6 +686,22 @@ export function addDreamTarget(target: Omit<DreamTarget, "id">) {
   });
 }
 
+export function updateDreamTarget(id: string, patch: Partial<Omit<DreamTarget, "id">>) {
+  const s = loadState();
+  saveState({
+    ...s,
+    targets: s.targets.map((t) => (t.id === id ? { ...t, ...patch } : t)),
+  });
+}
+
+export function deleteDreamTarget(id: string) {
+  const s = loadState();
+  saveState({
+    ...s,
+    targets: s.targets.filter((t) => t.id !== id),
+  });
+}
+
 export function saveScanResult(scan: Omit<ScanRecord, "id" | "scannedAt" | "exifStripped">) {
   const s = loadState();
   const entry: ScanRecord = {
@@ -553,6 +731,101 @@ export function saveScanResult(scan: Omit<ScanRecord, "id" | "scannedAt" | "exif
     coins: s.coins + 15,
     scans: [entry, ...s.scans],
     transactions: [autoTx, ...s.transactions],
+  });
+}
+
+export function updateScanRecord(id: string, patch: Partial<Omit<ScanRecord, "id" | "exifStripped">>) {
+  const s = loadState();
+  saveState({
+    ...s,
+    scans: s.scans.map((sc) => (sc.id === id ? { ...sc, ...patch } : sc)),
+  });
+}
+
+export function deleteScanRecord(id: string) {
+  const s = loadState();
+  saveState({
+    ...s,
+    scans: s.scans.filter((sc) => sc.id !== id),
+  });
+}
+
+/* -------------------------------------------------------------------------- */
+/* Super Admin Actions (Manajemen Pengguna, Saldo Koin & Impersonasi)          */
+/* -------------------------------------------------------------------------- */
+
+export function addManagedUser(user: Omit<ManagedUser, "id">) {
+  const s = loadState();
+  saveState({
+    ...s,
+    managedUsers: [{ ...user, id: uid("usr") }, ...s.managedUsers],
+  });
+}
+
+export function updateManagedUser(id: string, patch: Partial<Omit<ManagedUser, "id">>) {
+  const s = loadState();
+  const updatedList = s.managedUsers.map((u) => (u.id === id ? { ...u, ...patch } : u));
+  const target = updatedList.find((u) => u.id === id);
+  const isCurrentUser =
+    target && target.email.toLowerCase() === s.userEmail.toLowerCase();
+
+  saveState({
+    ...s,
+    managedUsers: updatedList,
+    ...(isCurrentUser && target
+      ? {
+          userName: target.name,
+          userEmail: target.email,
+          userRole: target.role,
+          villageName: target.villageName,
+          landAreaHa: target.landAreaHa,
+          plan: target.plan,
+          coins: target.coins,
+          streakDays: target.streakDays,
+        }
+      : {}),
+  });
+}
+
+export function deleteManagedUser(id: string) {
+  const s = loadState();
+  saveState({
+    ...s,
+    managedUsers: s.managedUsers.filter((u) => u.id !== id),
+  });
+}
+
+export function impersonateManagedUser(id: string) {
+  const s = loadState();
+  const target = s.managedUsers.find((u) => u.id === id);
+  if (!target) return;
+  saveState({
+    ...s,
+    isAuthenticated: true,
+    userName: target.name,
+    userEmail: target.email,
+    userRole: target.role,
+    villageName: target.villageName,
+    landAreaHa: target.landAreaHa,
+    plan: target.plan,
+    coins: target.coins,
+    streakDays: target.streakDays,
+  });
+}
+
+export function adminSetCoinsAndStreak(params: { coins: number; streakDays: number }) {
+  const s = loadState();
+  const nextCoins = Math.max(0, Math.round(params.coins));
+  const nextStreak = Math.max(0, Math.round(params.streakDays));
+  saveState({
+    ...s,
+    coins: nextCoins,
+    streakDays: nextStreak,
+    managedUsers: s.managedUsers.map((u) =>
+      u.email.toLowerCase() === s.userEmail.toLowerCase()
+        ? { ...u, coins: nextCoins, streakDays: nextStreak }
+        : u,
+    ),
   });
 }
 

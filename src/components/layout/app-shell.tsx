@@ -16,6 +16,7 @@ import {
   LogOut,
   Menu,
   ScanLine,
+  ShieldAlert,
   ShieldCheck,
   Target,
   UserCheck,
@@ -43,6 +44,7 @@ const NAV_ITEMS = [
   { href: "/target", label: "Target Lahan Impian", shortLabel: "Target", icon: Target, badge: "Goal" },
   { href: "/paket", label: "Paket Trial / Pro / VIP", shortLabel: "Paket", icon: Crown, badge: "Tier" },
   { href: "/profil", label: "Profil & Privasi UU PDP", shortLabel: "Profil", icon: ShieldCheck, badge: "Aman" },
+  { href: "/admin", label: "Panel Super Admin", shortLabel: "Admin", icon: ShieldAlert, badge: "CRUD" },
 ];
 
 const MOBILE_TABS = [
@@ -347,6 +349,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="grid grid-cols-1 gap-2">
               {(
                 [
+                  ["admin", "Super Admin (Administrator Sistem)", "Akses penuh melihat, menambah, mengedit & menghapus seluruh data pengguna, transaksi, scan AI, target, pengingat & cloud."],
                   ["petani", "Petani / Pekebun Lahan", "Fokus pencatatan pembukaan lahan tanpa bakar, kalkulasi penghematan pupuk NPK, dan klaim koin harian."],
                   ["kelompok_tani", "Pengurus Kelompok Tani / Koperasi", "Fokus manajemen kas kolektif, progres tabungan alat mekanis bersama (pencacah/pompa), & audit PDF."],
                   ["penyuluh", "Penyuluh / Relawan MPA", "Fokus pemantauan tinggi muka air gambut, kesiagaan sekat bakar, dan mitigasi risiko titik panas desa."],

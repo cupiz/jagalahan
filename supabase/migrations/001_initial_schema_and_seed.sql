@@ -11,7 +11,7 @@ create table if not exists public.v2_user_profiles (
   id uuid primary key default gen_random_uuid(),
   email text,
   display_name text not null,
-  user_role text not null default 'petani' check (user_role in ('petani', 'kelompok_tani', 'penyuluh')),
+  user_role text not null default 'petani' check (user_role in ('petani', 'kelompok_tani', 'penyuluh', 'admin')),
   village_name text not null,
   land_area_ha numeric(5,2) not null default 2.00,
   plan_tier text not null default 'vip' check (plan_tier in ('trial', 'pro', 'vip')),

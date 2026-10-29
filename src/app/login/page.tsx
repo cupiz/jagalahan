@@ -1,18 +1,17 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, CheckCircle2, Lock, Mail, ShieldCheck, UserCheck } from "lucide-react";
+import { ArrowRight, Lock, Mail, ShieldAlert, ShieldCheck } from "lucide-react";
 import { loginUser, type PlanTier, type UserRole } from "@/lib/store";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 
-
 /** Halaman tujuan setelah login (dari ?next=...), hanya path internal yang diizinkan. */
-function getNextPath(): string {
+function getNextPath(fallback = "/beranda"): string {
   const next = new URLSearchParams(window.location.search).get("next");
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/beranda";
+  return next && next.startsWith("/") && !next.startsWith("//") ? next : fallback;
 }
 
 const DEMO_ACCOUNTS: {
@@ -24,7 +23,19 @@ const DEMO_ACCOUNTS: {
   plan: PlanTier;
   villageName: string;
   landAreaHa: number;
+  redirectTo?: string;
 }[] = [
+  {
+    label: "Super Admin — Administrator Sistem (Full CRUD)",
+    sub: "Lihat & edit seluruh data pengguna, transaksi lahan, scan AI, target, pengingat & cloud",
+    name: "Super Admin JagaLahan",
+    email: "admin@jagalahan.web.id",
+    role: "admin",
+    plan: "vip",
+    villageName: "Pusat Komando Karhutla Kalteng",
+    landAreaHa: 50.0,
+    redirectTo: "/admin",
+  },
   {
     label: "Iqbal — Petani Mandiri (VIP)",
     sub: "Akses penuh: Smart Land Scanner AI + Laporan PDF + Koin",
@@ -67,7 +78,8 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     await loginUser({ email, password });
-    router.push(getNextPath());
+    const isAdminEmail = email.toLowerCase().includes("admin");
+    router.push(getNextPath(isAdminEmail ? "/admin" : "/beranda"));
   };
 
   const handleQuickDemo = async (preset: (typeof DEMO_ACCOUNTS)[number]) => {
@@ -80,13 +92,13 @@ export default function LoginPage() {
       villageName: preset.villageName,
       landAreaHa: preset.landAreaHa,
     });
-    router.push(getNextPath());
+    router.push(getNextPath(preset.redirectTo ?? "/beranda"));
   };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-emerald-200 selection:text-emerald-950">
       {/* Architectural Top Bar */}
-      <header className="border-b border-slate-200">
+      <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <Link href="/" className="flex items-center gap-3">
             <Image
@@ -135,22 +147,32 @@ export default function LoginPage() {
               <span className="font-mono text-[10px] text-emerald-700">1-KLIK MASUK</span>
             </div>
             <div className="mt-3 space-y-2.5">
-              {DEMO_ACCOUNTS.map((acc) => (
-                <button
-                  key={acc.email}
-                  type="button"
-                  onClick={() => handleQuickDemo(acc)}
-                  className="group flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-left transition hover:border-emerald-500 hover:bg-emerald-50"
-                >
-                  <div>
-                    <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
-                      {acc.label}
-                    </p>
-                    <p className="mt-0.5 text-[11px] text-slate-600">{acc.sub}</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-slate-500 transition group-hover:translate-x-1 group-hover:text-emerald-700" />
-                </button>
-              ))}
+              {DEMO_ACCOUNTS.map((acc) => {
+                const isAdmin = acc.role === "admin";
+                return (
+                  <button
+                    key={acc.email}
+                    type="button"
+                    onClick={() => handleQuickDemo(acc)}
+                    className={`group flex w-full items-center justify-between rounded-xl border px-4 py-3.5 text-left transition cursor-pointer ${
+                      isAdmin
+                        ? "border-emerald-600 bg-emerald-50/70 hover:bg-emerald-100/80"
+                        : "border-slate-200 bg-white hover:border-emerald-500 hover:bg-emerald-50"
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        {isAdmin && <ShieldAlert className="h-4 w-4 text-emerald-700" />}
+                        <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">
+                          {acc.label}
+                        </p>
+                      </div>
+                      <p className="mt-0.5 text-[11px] text-slate-600">{acc.sub}</p>
+                    </div>
+                    <ArrowRight className="h-4 w-4 shrink-0 text-slate-500 transition group-hover:translate-x-1 group-hover:text-emerald-700" />
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -168,7 +190,7 @@ export default function LoginPage() {
                 Masuk dengan Email
               </h2>
               <p className="mt-1 text-xs text-slate-600">
-                Masukkan kredensial akun JagaLahan Anda untuk melanjutkan ke dashboard.
+                Gunakan <code className="font-mono font-bold text-emerald-700">admin@jagalahan.web.id</code> untuk masuk sebagai Super Admin, atau pilih salah satu akun demo di samping.
               </p>
             </div>
 
@@ -214,7 +236,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-xs font-bold uppercase tracking-[0.1em] text-white transition hover:bg-emerald-700"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-xs font-bold uppercase tracking-[0.1em] text-white transition hover:bg-emerald-700 cursor-pointer"
               >
                 <span>{loading ? "Memverifikasi Sesi..." : "Masuk ke Dashboard"}</span>
                 <ArrowRight className="h-4 w-4" />
@@ -224,12 +246,12 @@ export default function LoginPage() {
             <div className="mt-8 rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-600">
               <div className="flex items-center gap-2 font-semibold text-slate-800">
                 <ShieldCheck className="h-4 w-4 text-emerald-700" />
-                <span>Arsitektur 3 Peran Pengguna (Roles)</span>
+                <span>Arsitektur 4 Peran Pengguna (Roles)</span>
               </div>
               <p className="mt-1.5 leading-relaxed">
-                Akun Anda menyesuaikan tampilan untuk <strong>Petani/Pekebun</strong>,{" "}
-                <strong>Pengurus Kelompok Tani</strong>, atau <strong>Penyuluh MPA</strong>. Belum
-                memiliki akun?{" "}
+                Akun Anda menyesuaikan hak akses untuk <strong>Super Admin</strong>,{" "}
+                <strong>Petani/Pekebun</strong>, <strong>Pengurus Kelompok Tani</strong>, atau{" "}
+                <strong>Penyuluh MPA</strong>. Belum memiliki akun?{" "}
                 <Link href="/register" className="font-bold text-emerald-700 hover:underline">
                   Daftar Trial 14 Hari Gratis →
                 </Link>
@@ -241,4 +263,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
