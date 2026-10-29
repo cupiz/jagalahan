@@ -96,6 +96,7 @@ export default function PantauAsapPage() {
         </div>
       )}
 
+      <div className="grid gap-5 lg:grid-cols-2 items-start">
       {/* Bagian 1: Formulir Lapor Asap Dini (Tingkat Blok/Parit Desa, Tanpa GPS Individu) */}
       <Card className="border-2 border-bahaya/30">
         <CardHeader className="pb-2">
@@ -346,6 +347,7 @@ export default function PantauAsapPage() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

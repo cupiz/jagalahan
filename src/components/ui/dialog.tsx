@@ -39,7 +39,7 @@ export function Dialog({ open, onOpenChange, title, description, children, class
       />
       <div
         className={cn(
-          "relative z-10 max-h-[88vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:rounded-3xl",
+          "relative z-10 max-h-[88vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:max-w-lg sm:rounded-3xl sm:p-6",
           className,
         )}
       >

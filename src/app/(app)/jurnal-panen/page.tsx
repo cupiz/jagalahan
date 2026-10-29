@@ -96,8 +96,9 @@ export default function JurnalPanenPage() {
         </div>
       )}
 
+      <div className="grid gap-5 lg:grid-cols-12">
       {/* Kontrol Filter & Sakelar Simulasi Ambang Privasi N >= 5 */}
-      <Card className="border-gambut/20">
+      <Card className="border-gambut/20 lg:col-span-7 h-fit">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between gap-2">
             <CardTitle className="flex items-center gap-1.5 text-base">
@@ -227,7 +228,7 @@ export default function JurnalPanenPage() {
       </Card>
 
       {/* Formulir Input Catatan Panen Baru (Satuan Lokal: Karung, Ton/ha, Rupiah) */}
-      <Card>
+      <Card className="lg:col-span-5 h-fit">
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Catat Hasil Panen & Biaya Kebun Saya</CardTitle>
           <CardDescription>Masukkan dengan satuan yang biasa Anda gunakan di desa.</CardDescription>
@@ -361,6 +362,7 @@ export default function JurnalPanenPage() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

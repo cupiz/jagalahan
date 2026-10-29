@@ -106,8 +106,9 @@ export default function KalkulatorPage() {
         </div>
       )}
 
-      {/* Panel Input Sederhana (Reduction: cukup 3 input) */}
-      <Card>
+      <div className="grid gap-5 lg:grid-cols-12">
+      {/* Panel Input Sederhana (Reduction: cukup 3 input) — 5 Kolom di Desktop */}
+      <Card className="lg:col-span-5 h-fit">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <CardTitle>1. Kondisi Lahan Anda</CardTitle>
@@ -201,8 +202,10 @@ export default function KalkulatorPage() {
         </CardContent>
       </Card>
 
+      {/* Kolom Kanan di Desktop (7 Kolom): Tabel Perbandingan + Ringkasan + Komitmen */}
+      <div className="space-y-4 lg:col-span-7">
       {/* Tabel 2 Kolom Sejajar: Cara Bakar vs. Tanpa Bakar */}
-      <div className="grid grid-cols-2 gap-2.5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {/* Kolom Kiri: Cara Bakar */}
         <Card className="border-slate-300 bg-slate-50/80">
           <CardHeader className="p-3.5 pb-2">
@@ -363,6 +366,8 @@ export default function KalkulatorPage() {
           </Button>
         </CardContent>
       </Card>
+      </div>
+      </div>
 
       {/* Dialog Transparansi Rumus Perhitungan */}
       <Dialog

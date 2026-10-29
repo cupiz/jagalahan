@@ -101,6 +101,8 @@ export default function MukaAirPage() {
         </div>
       )}
 
+      <div className="grid gap-5 lg:grid-cols-12">
+      <div className="space-y-4 lg:col-span-7">
       {/* Visualisasi Interaktif Tongkat Ukur 1 Meter (Skala per 10 cm) */}
       <Card className={cn(currentZone.border, currentZone.pattern)} style={{ borderColor: currentZone.color }}>
         <CardHeader className="pb-2">
@@ -247,8 +249,10 @@ export default function MukaAirPage() {
         </Card>
       )}
 
+      </div>
+
       {/* Grafik Riwayat 4 Minggu Terakhir (Termasuk Contoh Minggu Terlewat Non-Menghakimi) */}
-      <Card>
+      <Card className="lg:col-span-5 h-fit">
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Riwayat 4 Minggu Musim Kering</CardTitle>
           <CardDescription>
@@ -325,6 +329,7 @@ export default function MukaAirPage() {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
