@@ -1,26 +1,65 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ============================================================
+   Jaga Lahan — Design Tokens (docs/DESIGN_SYSTEM.md)
+   Kontras tinggi untuk sinar matahari, palet non-menghakimi,
+   zona air gambut: Warna + Ikon + Pola + Label.
+   ============================================================ */
+
+@theme {
+  --color-gambut: #1b5e3a;
+  --color-gambut-700: #164d30;
+  --color-gambut-900: #0f3a23;
+  --color-tunas: #e3f2ea;
+  --color-kertas: #f8faf7;
+  --color-arang: #14261c;
+  --color-kabut: #64748b;
+
+  --color-aman: #0d9488;
+  --color-aman-bg: #ccfbf1;
+  --color-waspada: #d97706;
+  --color-waspada-bg: #fef3c7;
+  --color-bahaya: #c2410c;
+  --color-bahaya-bg: #ffedd5;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #e7ede8;
+  color: var(--color-arang);
+}
+
+/* Pola latar zona (aksesibilitas buta warna) */
+.pattern-aman {
+  background-image: repeating-linear-gradient(0deg, transparent 0 9px, rgba(13, 148, 136, 0.16) 9px 11px);
+}
+.pattern-waspada {
+  background-image: repeating-linear-gradient(45deg, transparent 0 8px, rgba(217, 119, 6, 0.2) 8px 10px);
+}
+.pattern-bahaya {
+  background-image: radial-gradient(rgba(194, 65, 12, 0.28) 1.6px, transparent 1.8px);
+  background-size: 8px 8px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+@keyframes chop {
+  0%, 100% { transform: rotate(-18deg); }
+  50% { transform: rotate(22deg); }
+}
+.animate-chop {
+  animation: chop 0.9s ease-in-out infinite;
+  transform-origin: 80% 90%;
 }
