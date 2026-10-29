@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   User,
   ShieldCheck,
@@ -10,17 +12,25 @@ import {
   RotateCcw,
   CheckCircle2,
   Lock,
+  LogOut,
+  UserCheck,
 } from "lucide-react";
 import {
   useV2State,
   updateUserProfile,
   togglePrivacyMask,
   resetV2Data,
+  logoutUser,
+  ROLE_LABELS,
+  type UserRole,
 } from "@/lib/store";
 
 export default function ProfilPage() {
+  const router = useRouter();
   const state = useV2State();
   const [userName, setUserName] = useState(state.userName);
+  const [userEmail, setUserEmail] = useState(state.userEmail);
+  const [userRole, setUserRoleState] = useState<UserRole>(state.userRole);
   const [villageName, setVillageName] = useState(state.villageName);
   const [landAreaHa, setLandAreaHa] = useState(String(state.landAreaHa));
   const [savedNotice, setSavedNotice] = useState<string | null>(null);
@@ -29,10 +39,12 @@ export default function ProfilPage() {
     e.preventDefault();
     updateUserProfile({
       userName: userName.trim() || "Iqbal",
+      userEmail: userEmail.trim() || "iqbal@jagalahan.web.id",
+      userRole,
       villageName: villageName.trim() || "Desa Kalampangan, Palangka Raya",
       landAreaHa: Number(landAreaHa) || 2.0,
     });
-    setSavedNotice("Profil & data kebun berhasil diperbarui!");
+    setSavedNotice("Profil, Peran & data kebun berhasil diperbarui!");
     setTimeout(() => setSavedNotice(null), 3500);
   };
 
@@ -51,10 +63,17 @@ export default function ProfilPage() {
   const handleReset = () => {
     resetV2Data();
     setUserName("Iqbal");
+    setUserEmail("iqbal@jagalahan.web.id");
+    setUserRoleState("petani");
     setVillageName("Desa Kalampangan, Palangka Raya");
     setLandAreaHa("2");
     setSavedNotice("Seluruh data aplikasi dikembalikan ke setelan awal.");
     setTimeout(() => setSavedNotice(null), 3500);
+  };
+
+  const handleLogout = async () => {
+    await logoutUser();
+    router.push("/login");
   };
 
   return (
@@ -69,31 +88,62 @@ export default function ProfilPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         {/* Form Profil Petani / Pengelola Kebun (6 cols) */}
         <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800 lg:col-span-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300">
-              <User className="h-6 w-6" />
-            </div>
-            <div>
-              <h1 className="text-lg font-extrabold text-slate-900 dark:text-white">
-                Profil Pengguna & Lahan
-              </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Data disimpan secara lokal di perangkat Anda (Offline-First)
-              </p>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300">
+                <User className="h-6 w-6" />
+              </div>
+              <div>
+                <h1 className="text-lg font-extrabold text-slate-900 dark:text-white">
+                  Profil Pengguna, Peran & Lahan
+                </h1>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Peran Aktif: <strong className="text-emerald-600">{ROLE_LABELS[state.userRole]}</strong>
+                </p>
+              </div>
             </div>
           </div>
 
           <form onSubmit={handleSaveProfile} className="mt-5 space-y-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Nama Panggilan Pengguna
+                </label>
+                <input
+                  type="text"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Alamat Email Akun
+                </label>
+                <input
+                  type="email"
+                  value={userEmail}
+                  onChange={(e) => setUserEmail(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                Nama Panggilan Pengguna
+                Peran Ekosistem (Role)
               </label>
-              <input
-                type="text"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
+              <select
+                value={userRole}
+                onChange={(e) => setUserRoleState(e.target.value as UserRole)}
                 className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-              />
+              >
+                <option value="petani">Petani / Pekebun Lahan</option>
+                <option value="kelompok_tani">Pengurus Kelompok Tani / Koperasi</option>
+                <option value="penyuluh">Penyuluh / Relawan MPA</option>
+              </select>
             </div>
 
             <div>
@@ -124,11 +174,36 @@ export default function ProfilPage() {
 
             <button
               type="submit"
-              className="w-full rounded-2xl bg-emerald-600 py-3 text-xs font-extrabold text-white transition hover:bg-emerald-700"
+              className="w-full rounded-2xl bg-emerald-600 py-3 text-xs font-extrabold text-white transition hover:bg-emerald-700 cursor-pointer"
             >
-              Simpan Perubahan Profil
+              Simpan Perubahan Profil & Peran
             </button>
           </form>
+
+          {/* Aksi Sesi Akun (Ganti Akun / Register / Logout) */}
+          <div className="mt-5 grid grid-cols-1 gap-2.5 border-t border-slate-100 pt-4 sm:grid-cols-3">
+            <Link
+              href="/login"
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-extrabold text-slate-700 hover:bg-slate-100"
+            >
+              <UserCheck className="h-4 w-4 text-emerald-600" />
+              Ganti Akun
+            </Link>
+            <Link
+              href="/register"
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-xs font-extrabold text-emerald-700 hover:bg-emerald-100"
+            >
+              Daftar Baru
+            </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs font-extrabold text-rose-700 hover:bg-rose-100 cursor-pointer"
+            >
+              <LogOut className="h-4 w-4" />
+              Keluar (Logout)
+            </button>
+          </div>
         </div>
 
         {/* Privasi, Keamanan Data & Kepatuhan UU PDP No. 27/2022 (6 cols) */}

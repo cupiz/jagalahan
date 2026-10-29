@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   Bell,
@@ -13,13 +13,24 @@ import {
   FileSpreadsheet,
   Globe,
   Home,
+  LogOut,
   Menu,
   ScanLine,
   ShieldCheck,
   Target,
+  UserCheck,
 } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
-import { setPlanTier, togglePrivacyMask, useV2State, type PlanTier } from "@/lib/store";
+import {
+  logoutUser,
+  ROLE_LABELS,
+  setPlanTier,
+  setUserRole,
+  togglePrivacyMask,
+  useV2State,
+  type PlanTier,
+  type UserRole,
+} from "@/lib/store";
 import { cn, formatNumber } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -49,9 +60,15 @@ const PLAN_LABELS: Record<PlanTier, string> = {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const state = useV2State();
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await logoutUser();
+    router.push("/login");
+  };
 
   return (
     <div className="min-h-dvh w-full bg-slate-50 text-slate-900 lg:flex">
@@ -63,11 +80,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="border-b border-slate-100 p-5">
           <Link href="/" className="flex items-center gap-3">
             <Image
-              src="/icon-192.png"
+              src="/logo-jagalahan.png"
               alt="Logo JagaLahan"
               width={42}
               height={42}
-              className="rounded-2xl shadow-md shadow-emerald-500/20"
+              className="object-contain"
               priority
             />
             <div>
@@ -83,11 +100,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-emerald-100">Saldo JagaLahan Coins</span>
               <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-extrabold">
-                🔥 Streak {state.streakDays} Hari
+                Streak {state.streakDays} Hari
               </span>
             </div>
-            <p className="mt-1 text-xl font-black tabular-nums">🪙 {formatNumber(state.coins, 0)} Koin</p>
-            <p className="mt-0.5 truncate text-[11px] text-emerald-100">{state.villageName}</p>
+            <p className="mt-1 text-xl font-black tabular-nums">{formatNumber(state.coins, 0)} Koin</p>
+            <p className="mt-0.5 truncate text-[11px] text-emerald-100">
+              {ROLE_LABELS[state.userRole]} • {state.villageName}
+            </p>
           </div>
         </div>
 
@@ -125,7 +144,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             );
           })}
 
-          <div className="pt-3">
+          <div className="pt-3 space-y-1.5">
             <Link
               href="/"
               className="flex items-center gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2.5 text-xs font-extrabold text-emerald-700 hover:bg-emerald-100"
@@ -136,8 +155,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </nav>
 
-        {/* Pengaturan Level Paket (Trial / Pro / VIP) di Bawah Sidebar */}
-        <div className="border-t border-slate-100 bg-slate-50/60 p-4">
+        {/* Pengaturan Level Paket & Logout di Bawah Sidebar */}
+        <div className="border-t border-slate-100 bg-slate-50/60 p-4 space-y-2.5">
           <button
             type="button"
             onClick={() => setPlanDialogOpen(true)}
@@ -145,22 +164,36 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           >
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600">
-                Level Pengguna Aktif
+                Peran & Paket Aktif
               </span>
-              <span className="text-[11px] font-bold text-emerald-600 underline">Ubah Level</span>
+              <span className="text-[11px] font-bold text-emerald-600 underline">Ubah</span>
             </div>
             <p className="mt-0.5 flex items-center gap-1.5 text-sm font-black text-slate-900">
               <Crown className="size-4 text-amber-500" />
               {PLAN_LABELS[state.plan]}
             </p>
-            <p className="text-[11px] text-slate-500">
-              {state.plan === "vip"
-                ? "Akses penuh termasuk Smart Land Scanner"
-                : state.plan === "pro"
-                  ? "Tracking, Target Impian & Unduh PDF aktif"
-                  : "Mode uji coba gratis 14 hari"}
+            <p className="text-[11px] font-semibold text-slate-600 truncate">
+              {ROLE_LABELS[state.userRole]}
             </p>
           </button>
+
+          <div className="grid grid-cols-2 gap-2">
+            <Link
+              href="/login"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white py-2 text-xs font-bold text-slate-700 hover:bg-slate-100"
+            >
+              <UserCheck className="size-3.5 text-emerald-600" />
+              Ganti Akun
+            </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 cursor-pointer"
+            >
+              <LogOut className="size-3.5" />
+              Keluar
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -173,7 +206,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <div className="flex items-center gap-3">
               <Link href="/" className="flex items-center gap-2.5 lg:hidden">
-                <Image src="/icon-192.png" alt="JagaLahan" width={34} height={34} className="rounded-xl" />
+                <Image src="/logo-jagalahan.png" alt="JagaLahan" width={34} height={34} className="object-contain" />
                 <span className="text-base font-black tracking-tight text-slate-900">
                   JagaLahan<span className="text-emerald-600">.</span>
                 </span>
@@ -181,16 +214,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
               <div className="hidden lg:flex lg:items-center lg:gap-2">
                 <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-extrabold text-emerald-700">
-                  🌱 Halo, {state.userName} ({formatNumber(state.landAreaHa)} Ha Tanpa Bakar)
+                  {state.userName} • {ROLE_LABELS[state.userRole]} ({formatNumber(state.landAreaHa)} Ha)
                 </span>
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                  📍 {state.villageName}
+                  {state.villageName}
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Tombol Privacy Mode (Sembunyikan Nominal) seperti di FinTrack */}
+              {/* Tombol Privacy Mode (Sembunyikan Nominal) */}
               <button
                 type="button"
                 onClick={togglePrivacyMask}
@@ -206,7 +239,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href="/koin"
                 className="inline-flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-1.5 text-xs font-extrabold text-amber-800 ring-1 ring-amber-200 hover:bg-amber-100"
               >
-                <span>🪙</span>
+                <Coins className="size-3.5 text-amber-600" />
                 <span className="tabular-nums">{formatNumber(state.coins, 0)} Koin</span>
               </Link>
 
@@ -218,6 +251,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               >
                 <Crown className="size-3.5" />
                 <span>{PLAN_LABELS[state.plan]}</span>
+              </button>
+
+              {/* Tombol Keluar Cepat */}
+              <button
+                type="button"
+                onClick={handleLogout}
+                title="Keluar Akun (Logout)"
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-bold text-rose-700 hover:bg-rose-100 cursor-pointer"
+              >
+                <LogOut className="size-3.5" />
+                <span>Keluar</span>
               </button>
 
               <button
@@ -268,58 +312,105 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
       </div>
 
-      {/* Dialog Simulasi Ganti Level Pengguna (Trial 14 Hari / Pro / VIP) */}
+      {/* Dialog Simulasi Ganti Peran & Level Pengguna (Trial 14 Hari / Pro / VIP) */}
       <Dialog
         open={planDialogOpen}
         onOpenChange={setPlanDialogOpen}
-        title="Pilih Level Pengguna (Simulasi Paket)"
-        description="Uji bagaimana tampilan JagaLahan menyesuaikan fitur untuk pengguna Trial 14 Hari, Pro, dan VIP."
+        title="Simulasi Peran (Role) & Level Paket"
+        description="Uji bagaimana JagaLahan menyesuaikan fitur persuasi berdasarkan Peran Pengguna dan Level Langganan."
       >
-        <div className="space-y-2.5">
-          {(
-            [
-              [
-                "trial",
-                "Trial 14 Hari (Gratis)",
-                "Bisa akses Tracking Lahan, Pengingat Siaga, dan Check-in Harian. Fitur Target Impian, Unduh PDF, & Smart Scanner dikunci secara transparan.",
-              ],
-              [
-                "pro",
-                "Paket Pro (Rp9.900 / bulan)",
-                "Membuka Koin & Reward, Target Lahan Impian, serta Laporan & Unduh PDF. Smart Land Scanner belum termasuk.",
-              ],
-              [
-                "vip",
-                "Paket VIP (Rp19.900 / bulan)",
-                "Mencakup seluruh fitur Pro ditambah akses eksklusif ke Smart Land & Smoke Scanner berbasis AI.",
-              ],
-            ] as const
-          ).map(([tier, title, desc]) => (
-            <button
-              key={tier}
-              type="button"
-              onClick={() => {
-                setPlanTier(tier);
-                setPlanDialogOpen(false);
-              }}
-              className={cn(
-                "w-full rounded-2xl border-2 p-3.5 text-left transition",
-                state.plan === tier
-                  ? "border-emerald-600 bg-emerald-50/70"
-                  : "border-slate-200 bg-white hover:border-emerald-300",
-              )}
+        <div className="space-y-4">
+          <div>
+            <p className="mb-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+              1. Pilih Peran Ekosistem (Role)
+            </p>
+            <div className="grid grid-cols-1 gap-2">
+              {(
+                [
+                  ["petani", "Petani / Pekebun Lahan", "Fokus pencatatan pembukaan lahan tanpa bakar, kalkulasi penghematan pupuk NPK, dan klaim koin harian."],
+                  ["kelompok_tani", "Pengurus Kelompok Tani / Koperasi", "Fokus manajemen kas kolektif, progres tabungan alat mekanis bersama (pencacah/pompa), & audit PDF."],
+                  ["penyuluh", "Penyuluh / Relawan MPA", "Fokus pemantauan tinggi muka air gambut, kesiagaan sekat bakar, dan mitigasi risiko titik panas desa."],
+                ] as [UserRole, string, string][]
+              ).map(([roleKey, roleTitle, roleDesc]) => (
+                <button
+                  key={roleKey}
+                  type="button"
+                  onClick={() => setUserRole(roleKey)}
+                  className={cn(
+                    "w-full rounded-xl border p-3 text-left transition",
+                    state.userRole === roleKey
+                      ? "border-emerald-600 bg-emerald-50/70"
+                      : "border-slate-200 bg-white hover:border-emerald-300",
+                  )}
+                >
+                  <p className="text-xs font-black text-slate-900">{roleTitle}</p>
+                  <p className="mt-0.5 text-[11px] text-slate-600">{roleDesc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+              2. Pilih Level Langganan (Subscription Tier)
+            </p>
+            <div className="space-y-2">
+              {(
+                [
+                  [
+                    "trial",
+                    "Trial 14 Hari (Gratis)",
+                    "Akses Tracking Lahan, Pengingat Siaga, & Check-in Harian. Fitur Target Impian, Unduh PDF, & Smart Scanner terkunci.",
+                  ],
+                  [
+                    "pro",
+                    "Paket Pro (Rp9.900 / bulan)",
+                    "Membuka Koin & Reward, Target Lahan Impian, serta Laporan & Unduh PDF.",
+                  ],
+                  [
+                    "vip",
+                    "Paket VIP (Rp19.900 / bulan)",
+                    "Mencakup seluruh fitur Pro ditambah akses eksklusif ke Smart Land & Smoke Scanner berbasis AI.",
+                  ],
+                ] as const
+              ).map(([tier, title, desc]) => (
+                <button
+                  key={tier}
+                  type="button"
+                  onClick={() => {
+                    setPlanTier(tier);
+                    setPlanDialogOpen(false);
+                  }}
+                  className={cn(
+                    "w-full rounded-xl border-2 p-3 text-left transition",
+                    state.plan === tier
+                      ? "border-emerald-600 bg-emerald-50/70"
+                      : "border-slate-200 bg-white hover:border-emerald-300",
+                  )}
+                >
+                  <p className="text-xs font-black text-slate-900">{title}</p>
+                  <p className="mt-0.5 text-[11px] leading-relaxed text-slate-600">{desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-1">
+            <Link
+              href="/paket"
+              onClick={() => setPlanDialogOpen(false)}
+              className="text-xs font-extrabold text-emerald-600 hover:underline"
             >
-              <p className="text-sm font-black text-slate-900">{title}</p>
-              <p className="mt-0.5 text-xs leading-relaxed text-slate-600">{desc}</p>
-            </button>
-          ))}
-          <Link
-            href="/paket"
-            onClick={() => setPlanDialogOpen(false)}
-            className="block pt-1 text-center text-xs font-extrabold text-emerald-600 hover:underline"
-          >
-            Lihat Tabel Perbandingan Lengkap Paket Langganan →
-          </Link>
+              Tabel Perbandingan Paket →
+            </Link>
+            <Link
+              href="/login"
+              onClick={() => setPlanDialogOpen(false)}
+              className="text-xs font-extrabold text-slate-600 hover:underline"
+            >
+              Halaman Login / Ganti Akun →
+            </Link>
+          </div>
         </div>
       </Dialog>
 
@@ -328,7 +419,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         open={mobileDrawerOpen}
         onOpenChange={setMobileDrawerOpen}
         title="Menu Lengkap JagaLahan"
-        description="Pilih halaman fitur yang ingin dibuka"
+        description={`${state.userName} • ${ROLE_LABELS[state.userRole]}`}
       >
         <div className="space-y-1.5">
           {NAV_ITEMS.map(({ href, label, icon: Icon, badge }) => (
@@ -345,13 +436,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500">{badge}</span>
             </Link>
           ))}
-          <Link
-            href="/"
-            onClick={() => setMobileDrawerOpen(false)}
-            className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-emerald-50 px-3.5 py-2.5 text-xs font-extrabold text-emerald-700"
-          >
-            <Globe className="size-4" /> Kembali ke Landing Page
-          </Link>
+          <div className="grid grid-cols-2 gap-2 pt-2">
+            <Link
+              href="/"
+              onClick={() => setMobileDrawerOpen(false)}
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-50 px-3 py-2.5 text-xs font-extrabold text-emerald-700"
+            >
+              <Globe className="size-4" /> Landing Page
+            </Link>
+            <button
+              type="button"
+              onClick={() => {
+                setMobileDrawerOpen(false);
+                handleLogout();
+              }}
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-rose-50 px-3 py-2.5 text-xs font-extrabold text-rose-700"
+            >
+              <LogOut className="size-4" /> Keluar Akun
+            </button>
+          </div>
         </div>
       </Dialog>
     </div>

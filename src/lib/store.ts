@@ -2,18 +2,21 @@
 
 import { useSyncExternalStore } from "react";
 import { todayIso, uid } from "@/lib/utils";
+import { getSupabase } from "@/lib/supabase/client";
 
 /**
- * JagaLahan v2 Store — Penyimpanan lokal interaktif untuk:
- * 1. Tracking Lahan Tanpa Bakar (Manfaat & Biaya Kelola) + Unduh Laporan PDF
- * 2. Smart Land & Smoke Scanner (AI Kamera Pemindai Lahan/Semak/Asap)
- * 3. Check-in Harian Bebas Api, Streak, & JagaLahan Coins (Koin Hijau + Tukar Reward)
- * 4. Pengingat Siaga Karhutla & Jadwal Lahan
- * 5. Target Lahan Impian (Goal Setting & Progress Bar)
- * 6. Level Pengguna & Paket Langganan (Trial 14 Hari, Pro, VIP)
+ * JagaLahan Store — Penyimpanan interaktif (Offline-First + Supabase Sync) untuk:
+ * 1. Autentikasi & Peran Pengguna (Petani, Pengurus Kelompok Tani, Penyuluh MPA)
+ * 2. Tracking Lahan Tanpa Bakar (Manfaat & Biaya Kelola) + Unduh Laporan PDF
+ * 3. Smart Land & Smoke Scanner (AI Kamera Pemindai Lahan/Semak/Asap)
+ * 4. Check-in Harian Bebas Api, Streak, & JagaLahan Coins (Koin Hijau + Tukar Reward)
+ * 5. Pengingat Siaga Karhutla & Jadwal Lahan
+ * 6. Target Lahan Impian (Goal Setting & Progress Bar)
+ * 7. Level Pengguna & Paket Langganan (Trial 14 Hari, Pro, VIP)
  */
 
 export type PlanTier = "trial" | "pro" | "vip";
+export type UserRole = "petani" | "kelompok_tani" | "penyuluh";
 export type TxType = "manfaat" | "biaya";
 export type TxCategory =
   | "Kompos & Mulsa"
@@ -22,6 +25,12 @@ export type TxCategory =
   | "Bantuan & Insentif"
   | "Sekat Kanal & Air"
   | "Lainnya";
+
+export const ROLE_LABELS: Record<UserRole, string> = {
+  petani: "Petani / Pekebun",
+  kelompok_tani: "Pengurus Kelompok Tani",
+  penyuluh: "Penyuluh / Relawan MPA",
+};
 
 export interface LandTransaction {
   id: string;
@@ -77,7 +86,10 @@ export interface ScanRecord {
 }
 
 export interface JagaLahanV2State {
+  isAuthenticated: boolean;
   userName: string;
+  userEmail: string;
+  userRole: UserRole;
   villageName: string;
   landAreaHa: number;
   plan: PlanTier;
@@ -93,11 +105,14 @@ export interface JagaLahanV2State {
   scans: ScanRecord[];
 }
 
-const STORAGE_KEY = "jagalahan:v2";
+const STORAGE_KEY = "jagalahan:state";
 
 export function createInitialV2State(): JagaLahanV2State {
   return {
+    isAuthenticated: true,
     userName: "Iqbal",
+    userEmail: "iqbal@jagalahan.web.id",
+    userRole: "petani",
     villageName: "Desa Kalampangan, Palangka Raya",
     landAreaHa: 2.0,
     plan: "vip",
@@ -274,11 +289,113 @@ export function useV2State(): JagaLahanV2State {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Actions                                                                     */
+/* Auth & Role Actions                                                         */
 /* -------------------------------------------------------------------------- */
+
+export async function loginUser(params: {
+  email: string;
+  password?: string;
+  name?: string;
+  role?: UserRole;
+  plan?: PlanTier;
+  villageName?: string;
+  landAreaHa?: number;
+}) {
+  const sb = getSupabase();
+  if (sb && params.password) {
+    try {
+      await sb.auth.signInWithPassword({
+        email: params.email,
+        password: params.password,
+      });
+    } catch {
+      /* fallback ke sesi lokal jika belum terdaftar di cloud */
+    }
+  }
+  const s = loadState();
+  const inferredName =
+    params.name ||
+    params.email
+      .split("@")[0]
+      .replace(/[._-]/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase()) ||
+    "Iqbal";
+
+  saveState({
+    ...s,
+    isAuthenticated: true,
+    userEmail: params.email,
+    userName: inferredName,
+    userRole: params.role ?? s.userRole,
+    plan: params.plan ?? s.plan,
+    villageName: params.villageName ?? s.villageName,
+    landAreaHa: params.landAreaHa ?? s.landAreaHa,
+  });
+}
+
+export async function registerUser(params: {
+  name: string;
+  email: string;
+  password?: string;
+  role: UserRole;
+  villageName: string;
+  landAreaHa: number;
+  plan?: PlanTier;
+}) {
+  const sb = getSupabase();
+  if (sb && params.password) {
+    try {
+      await sb.auth.signUp({
+        email: params.email,
+        password: params.password,
+        options: {
+          data: {
+            display_name: params.name,
+            role: params.role,
+            village_name: params.villageName,
+            land_area_ha: params.landAreaHa,
+          },
+        },
+      });
+    } catch {
+      /* fallback ke penyimpanan lokal */
+    }
+  }
+  const s = loadState();
+  saveState({
+    ...s,
+    isAuthenticated: true,
+    userName: params.name.trim() || "Petani JagaLahan",
+    userEmail: params.email.trim() || "petani@jagalahan.web.id",
+    userRole: params.role,
+    villageName: params.villageName.trim() || "Desa Kalampangan, Palangka Raya",
+    landAreaHa: params.landAreaHa || 2.0,
+    plan: params.plan ?? "trial",
+  });
+}
+
+export async function logoutUser() {
+  const sb = getSupabase();
+  if (sb) {
+    try {
+      await sb.auth.signOut();
+    } catch {
+      /* ignore */
+    }
+  }
+  const s = loadState();
+  saveState({
+    ...s,
+    isAuthenticated: false,
+  });
+}
 
 export function setPlanTier(plan: PlanTier) {
   saveState({ ...loadState(), plan });
+}
+
+export function setUserRole(userRole: UserRole) {
+  saveState({ ...loadState(), userRole });
 }
 
 export function togglePrivacyMask() {
@@ -295,7 +412,9 @@ export function toggleDarkMode() {
   saveState({ ...s, darkMode: nextDark });
 }
 
-export function updateUserProfile(patch: Partial<Pick<JagaLahanV2State, "userName" | "villageName" | "landAreaHa">>) {
+export function updateUserProfile(
+  patch: Partial<Pick<JagaLahanV2State, "userName" | "userEmail" | "userRole" | "villageName" | "landAreaHa">>,
+) {
   saveState({ ...loadState(), ...patch });
 }
 
@@ -304,7 +423,7 @@ export function addTransaction(tx: Omit<LandTransaction, "id">) {
   const entry: LandTransaction = { ...tx, id: uid("tx") };
   saveState({
     ...s,
-    coins: s.coins + 5, // +5 koin untuk pencatatan rutin
+    coins: s.coins + 5,
     transactions: [entry, ...s.transactions],
   });
 }
@@ -318,7 +437,7 @@ export function performDailyCheckIn(): { ok: boolean; bonusCoins: number; messag
   const s = loadState();
   const today = todayIso();
   if (s.lastCheckInDate === today) {
-    return { ok: false, bonusCoins: 0, message: "Kamu sudah Check-in hari ini! Kembali lagi besok ya 🌱" };
+    return { ok: false, bonusCoins: 0, message: "Kamu sudah Check-in hari ini! Kembali lagi besok ya." };
   }
   const nextStreak = s.streakDays + 1;
   const milestoneBonus = nextStreak % 7 === 0 ? 25 : 0;

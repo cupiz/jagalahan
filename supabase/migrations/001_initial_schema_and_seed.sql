@@ -1,15 +1,17 @@
 -- =============================================================================
--- JagaLahan v2 — Supabase PostgreSQL Schema & Initial Seed Data
+-- JagaLahan — Supabase PostgreSQL Schema & Initial Seed Data
 -- Penyusun: Iqbal Ahdagita Elbadra (NIM: 26MA41D022)
 -- Kepatuhan: UU Pelindungan Data Pribadi (UU No. 27 Tahun 2022)
 -- =============================================================================
 
 create extension if not exists "pgcrypto";
 
--- 1. Tabel Profil & Paket Langganan Pengguna (Trial 14 Hari / Pro / VIP)
+-- 1. Tabel Profil, Role & Paket Langganan Pengguna (Trial 14 Hari / Pro / VIP)
 create table if not exists public.v2_user_profiles (
   id uuid primary key default gen_random_uuid(),
+  email text,
   display_name text not null,
+  user_role text not null default 'petani' check (user_role in ('petani', 'kelompok_tani', 'penyuluh')),
   village_name text not null,
   land_area_ha numeric(5,2) not null default 2.00,
   plan_tier text not null default 'vip' check (plan_tier in ('trial', 'pro', 'vip')),
