@@ -106,10 +106,12 @@ export interface JagaLahanV2State {
 }
 
 const STORAGE_KEY = "jagalahan:state";
+/** Sesi login disimpan terpisah dari data lahan agar default-nya selalu "belum login". */
+const SESSION_KEY = "jagalahan:session";
 
 export function createInitialV2State(): JagaLahanV2State {
   return {
-    isAuthenticated: true,
+    isAuthenticated: false,
     userName: "Iqbal",
     userEmail: "iqbal@jagalahan.web.id",
     userRole: "petani",
@@ -256,9 +258,10 @@ function loadState(): JagaLahanV2State {
   if (currentState) return currentState;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    currentState = raw
+    const base = raw
       ? { ...createInitialV2State(), ...(JSON.parse(raw) as Partial<JagaLahanV2State>) }
       : createInitialV2State();
+    currentState = { ...base, isAuthenticated: window.localStorage.getItem(SESSION_KEY) === "1" };
   } catch {
     currentState = createInitialV2State();
   }
@@ -269,10 +272,19 @@ function saveState(next: JagaLahanV2State) {
   currentState = next;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    if (next.isAuthenticated) window.localStorage.setItem(SESSION_KEY, "1");
+    else window.localStorage.removeItem(SESSION_KEY);
   } catch {
     /* ignore quota errors */
   }
   listeners.forEach((l) => l());
+}
+
+const noopSubscribe = () => () => {};
+
+/** `false` saat SSR/hidrasi, `true` setelah berjalan di browser (state localStorage sudah terbaca). */
+export function useHydrated(): boolean {
+  return useSyncExternalStore(noopSubscribe, () => true, () => false);
 }
 
 function subscribe(listener: () => void) {
@@ -545,10 +557,11 @@ export function saveScanResult(scan: Omit<ScanRecord, "id" | "scannedAt" | "exif
 }
 
 export function resetV2Data() {
+  const wasAuthenticated = loadState().isAuthenticated;
   try {
     window.localStorage.removeItem(STORAGE_KEY);
   } catch {
     /* ignore */
   }
-  saveState(createInitialV2State());
+  saveState({ ...createInitialV2State(), isAuthenticated: wasAuthenticated });
 }

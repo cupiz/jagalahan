@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Bell,
   Coins,
@@ -27,6 +27,7 @@ import {
   setPlanTier,
   setUserRole,
   togglePrivacyMask,
+  useHydrated,
   useV2State,
   type PlanTier,
   type UserRole,
@@ -62,13 +63,32 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const state = useV2State();
+  const hydrated = useHydrated();
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  // Auth guard: semua halaman di dalam (app) wajib login terlebih dahulu.
+  useEffect(() => {
+    if (hydrated && !state.isAuthenticated) {
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+    }
+  }, [hydrated, state.isAuthenticated, pathname, router]);
 
   const handleLogout = async () => {
     await logoutUser();
     router.push("/login");
   };
+
+  if (!hydrated || !state.isAuthenticated) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-3 text-slate-500">
+          <Image src="/logo-jagalahan.png" alt="JagaLahan" width={44} height={44} className="animate-pulse object-contain" />
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em]">Memeriksa sesi login…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-dvh w-full bg-slate-50 text-slate-900 lg:flex">
