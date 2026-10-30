@@ -61,7 +61,7 @@ const SYSTEM_INDEX = [
   {
     idx: "05",
     code: "TUNNELING & GOAL SETTING",
-    title: "Target Alat Impian",
+    title: "Tabungan Alat Kebun",
     desc: "Tabungan kolektif mesin pencacah semak dan pompa air gambut.",
     metric: "78% Terkumpul",
     href: "/target",
@@ -446,7 +446,7 @@ export default function LandingPage() {
                     href="/target"
                     className="w-full py-3.5 px-4 rounded-xl border border-emerald-600/30 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-mono font-bold text-xs uppercase tracking-[0.16em] flex items-center justify-between transition-colors"
                   >
-                    <span>Lihat Target Alat Impian</span>
+                    <span>Buka Tabungan Alat Kebun</span>
                     <ArrowUpRight className="w-4 h-4" />
                   </Link>
                 </div>

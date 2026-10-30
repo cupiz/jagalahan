@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: "%s | JagaLahan",
   },
   description:
-    "Platform teknologi persuasif pencegahan Karhutla: AI Smart Land & Smoke Scanner, Tracking Manfaat Tanpa Bakar, Check-in Benih Hijau, Pengingat Siaga, dan Target Lahan Impian.",
+    "Platform teknologi persuasif pencegahan Karhutla: AI Smart Land & Smoke Scanner, Tracking Manfaat Tanpa Bakar, Check-in Benih Hijau, Pengingat Siaga, dan Tabungan Alat Kebun.",
   applicationName: "JagaLahan",
   authors: [{ name: "Iqbal Ahdagita Elbadra" }],
   alternates: {

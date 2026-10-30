@@ -49,7 +49,7 @@ export default function TargetPage() {
       title: title.trim(),
       subtitle:
         subtitle.trim() ||
-        "Ayo terus konsisten kelola lahan tanpa bakar, target impianmu pasti tercapai!",
+        "Ayo terus konsisten kelola lahan tanpa bakar, alat kebun idamanmu segera terbeli!",
       targetAmount: Number(targetAmount) || 5_000_000,
       savedAmount: Number(savedAmount) || 500_000,
       monthlySaving: Number(monthlySaving) || 400_000,
@@ -76,15 +76,15 @@ export default function TargetPage() {
       <div className="flex flex-col justify-between gap-4 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-slate-800 md:flex-row md:items-center">
         <div>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">
-            <Target className="h-3.5 w-3.5" />
-            Self-Monitoring & Goal Setting
+            <Sprout className="h-3.5 w-3.5" />
+            Celengan Alat Tani Bebas Bakar
           </span>
           <h1 className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-white">
-            Target Lahan Impian Tanpa Bakar
+            Tabungan Alat Kebun
           </h1>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Ubah penghematan pupuk dan hasil panen tanpa bakar menjadi tabungan alat pertanian
-            modern impianmu.
+            Kumpulkan penghematan pupuk NPK dan serasah tanpa bakar untuk membeli alat kebun
+            bersama (mesin pencacah, pompa air, dan bibit).
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export default function TargetPage() {
           className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700"
         >
           <Plus className="h-4 w-4" />
-          Buat Target Impian Baru
+          Buka Tabungan Alat Baru
         </button>
       </div>
 
@@ -105,13 +105,13 @@ export default function TargetPage() {
             <div>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-bold backdrop-blur-sm">
                 <Award className="h-3.5 w-3.5 text-amber-300" />
-                Target Prioritas Utama
+                Tabungan Alat Utama
               </span>
               <h2 className="mt-2 text-2xl font-extrabold">{featured.title}</h2>
               <p className="mt-1 text-xs text-emerald-100">{featured.subtitle}</p>
             </div>
             <div className="text-left md:text-right">
-              <span className="text-xs font-semibold text-emerald-100">Progres Saat Ini</span>
+              <span className="text-xs font-semibold text-emerald-100">Progres Pengadaan</span>
               <p className="text-3xl font-extrabold">
                 {Math.min(100, Math.round((featured.savedAmount / featured.targetAmount) * 100))}%
               </p>
@@ -127,9 +127,14 @@ export default function TargetPage() {
             />
           </div>
 
-          {/* Milestone Checkpoints 25% - 50% - 75% - 100% */}
+          {/* Tahapan Kesiapan Alat 25% - 50% - 75% - 100% */}
           <div className="mt-3 grid grid-cols-4 gap-2 text-center text-[11px] font-bold">
-            {[25, 50, 75, 100].map((m) => {
+            {[
+              { m: 25, label: "Modal Awal" },
+              { m: 50, label: "Setengah Jalan" },
+              { m: 75, label: "Siap Pesan" },
+              { m: 100, label: "Alat Terbeli" },
+            ].map(({ m, label }) => {
               const reached =
                 Math.round((featured.savedAmount / featured.targetAmount) * 100) >= m;
               return (
@@ -139,7 +144,7 @@ export default function TargetPage() {
                     reached ? "bg-white/25 text-white" : "bg-white/10 text-emerald-200/70"
                   }`}
                 >
-                  {reached ? "✓ " : ""}Milestone {m}%
+                  {reached ? "✓ " : ""}{m}% ({label})
                 </div>
               );
             })}
@@ -152,7 +157,7 @@ export default function TargetPage() {
                 <strong className="text-sm">{mask(formatRupiah(featured.savedAmount))}</strong>
               </div>
               <div>
-                <span className="text-emerald-200">Target Total:</span>{" "}
+                <span className="text-emerald-200">Harga Alat:</span>{" "}
                 <strong className="text-sm">{mask(formatRupiah(featured.targetAmount))}</strong>
               </div>
               <div>
@@ -160,7 +165,7 @@ export default function TargetPage() {
                 <strong>{mask(formatRupiah(featured.monthlySaving))}/bulan</strong>
               </div>
               <div>
-                <span className="text-emerald-200">Target Tercapai:</span>{" "}
+                <span className="text-emerald-200">Target Terbeli:</span>{" "}
                 <strong>{featured.deadline}</strong>
               </div>
             </div>
@@ -270,12 +275,12 @@ export default function TargetPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl dark:bg-slate-900">
             <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">
-              + Buat Target Lahan Impian Baru
+              + Buka Tabungan Alat Baru
             </h3>
             <form onSubmit={handleCreateTarget} className="mt-4 space-y-3.5">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Nama Target Impian
+                  Nama Alat / Mesin Kebun
                 </label>
                 <input
                   type="text"
@@ -290,7 +295,7 @@ export default function TargetPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                    Target Dana (Rp)
+                    Harga Alat (Rp)
                   </label>
                   <input
                     type="number"
@@ -302,7 +307,7 @@ export default function TargetPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                    Dana Awal (Rp)
+                    Modal Awal (Rp)
                   </label>
                   <input
                     type="number"
@@ -317,7 +322,7 @@ export default function TargetPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                    Tabungan Rutin / Bulan
+                    Tabungan Rutin per Bulan
                   </label>
                   <input
                     type="number"
@@ -329,7 +334,7 @@ export default function TargetPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                    Target Waktu Tercapai
+                    Target Waktu Pembelian
                   </label>
                   <input
                     type="text"
@@ -343,7 +348,7 @@ export default function TargetPage() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Ikon Kategori
+                  Kategori Alat
                 </label>
                 <select
                   value={icon}
@@ -366,9 +371,9 @@ export default function TargetPage() {
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-emerald-600 px-5 py-2 text-xs font-bold text-white"
+                  className="rounded-xl bg-emerald-600 px-5 py-2 text-xs font-bold text-white cursor-pointer hover:bg-emerald-700"
                 >
-                  Simpan Target
+                  Simpan Tabungan Alat
                 </button>
               </div>
             </form>

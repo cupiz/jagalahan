@@ -369,7 +369,7 @@ export default function BerandaPage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-extrabold text-slate-900 dark:text-white">
-                Target Lahan Impian
+                Tabungan Alat Kebun
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Wujudkan alat pertanian tanpa bakar dari akumulasi penghematan lahanmu
@@ -380,7 +380,7 @@ export default function BerandaPage() {
               className="inline-flex items-center gap-1 rounded-xl bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300"
             >
               <Target className="h-3.5 w-3.5" />
-              Kelola Target
+              Kelola Tabungan
             </Link>
           </div>
 

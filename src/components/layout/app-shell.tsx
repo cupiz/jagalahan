@@ -42,7 +42,7 @@ const NAV_ITEMS = [
   { href: "/scanner", label: "Smart Land Scanner", shortLabel: "Scanner", icon: ScanLine, badge: "AI Poktan" },
   { href: "/koin", label: "Check-in & Benih Hijau", shortLabel: "Benih", icon: Coins, badge: "+Benih" },
   { href: "/pengingat", label: "Pengingat Siaga", shortLabel: "Pengingat", icon: Bell, badge: "Trigger" },
-  { href: "/target", label: "Target Lahan Impian", shortLabel: "Target", icon: Target, badge: "Goal" },
+  { href: "/target", label: "Tabungan Alat Kebun", shortLabel: "Tabungan", icon: Target, badge: "Alat" },
   { href: "/paket", label: "Pilihan Paket Edukatif", shortLabel: "Paket", icon: Crown, badge: "Tier" },
   { href: "/profil", label: "Profil & Privasi UU PDP", shortLabel: "Profil", icon: ShieldCheck, badge: "Aman" },
   { href: "/admin", label: "Panel Super Admin", shortLabel: "Admin", icon: ShieldAlert, badge: "CRUD" },
@@ -378,12 +378,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   [
                     "trial",
                     "Perintis Lahan (Trial 30 Hari Gratis)",
-                    "Akses Tracking Lahan, Pengingat Siaga, & Check-in Harian Bebas Api selama 30 hari penuh. Fitur Target Impian, Ekspor PDF, & Smart Scanner AI terkunci.",
+                    "Akses Tracking Lahan, Pengingat Siaga, & Check-in Harian Bebas Api selama 30 hari penuh. Fitur Tabungan Alat Kebun, Ekspor PDF, & Smart Scanner AI terkunci.",
                   ],
                   [
                     "pro",
                     "Paket Tani Mandiri (Rp10.999 / bulan)",
-                    "Membuka akumulasi Benih Hijau & katalog subsidi Saprotan, Target Lahan Impian, serta Ekspor Laporan PDF.",
+                    "Membuka akumulasi Benih Hijau & katalog subsidi Saprotan, Tabungan Alat Kebun, serta Ekspor Laporan PDF.",
                   ],
                   [
                     "vip",

@@ -614,7 +614,7 @@ export default function SuperAdminPage() {
 
           <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">
             <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-              <span>SMART SCAN AI & TARGET</span>
+              <span>SMART SCAN AI & TABUNGAN</span>
               <Camera className="h-4 w-4 text-indigo-600" />
             </div>
             <p className="mt-1.5 text-2xl font-black text-slate-900">
@@ -647,7 +647,7 @@ export default function SuperAdminPage() {
             ["users", "1. Data Pengguna & Role", Users, state.managedUsers.length],
             ["transactions", "2. Data Transaksi Lahan", FileSpreadsheet, state.transactions.length],
             ["scans", "3. Data Smart Scanner AI", Camera, state.scans.length],
-            ["targets", "4. Data Target Impian", Target, state.targets.length],
+            ["targets", "4. Data Tabungan Alat Kebun", Target, state.targets.length],
             ["reminders", "5. Pengingat & Benih Hijau", Bell, state.reminders.length + state.redemptions.length],
             ["cloud", "6. Database Cloud Supabase", Database, 6],
           ] as [AdminTab, string, React.ElementType, number][]
@@ -1059,7 +1059,7 @@ export default function SuperAdminPage() {
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
               <h2 className="text-lg font-black text-slate-900">
-                Manajemen Target Lahan Impian (Goal Setting)
+                Manajemen Tabungan Alat Kebun (Celengan Petani)
               </h2>
               <p className="text-xs text-slate-500">
                 Edit target harga alat pertanian, jumlah tabungan terkumpul, maupun tenggat waktu.
@@ -1071,7 +1071,7 @@ export default function SuperAdminPage() {
               className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-emerald-700 cursor-pointer"
             >
               <Plus className="h-4 w-4" />
-              Tambah Target Baru
+              Tambah Tabungan Alat Baru
             </button>
           </div>
 
@@ -1364,7 +1364,7 @@ export default function SuperAdminPage() {
               ["v2_land_transactions", "Tabel Transaksi Manfaat & Biaya"],
               ["v2_smart_scans", "Tabel Smart Scanner AI (EXIF Stripped)"],
               ["v2_reminders", "Tabel Pengingat Siaga Karhutla"],
-              ["v2_dream_targets", "Tabel Target Lahan Impian"],
+              ["v2_dream_targets", "Tabel Tabungan Alat Kebun"],
               ["v2_reward_redemptions", "Tabel Penukaran Voucher Benih Hijau"],
             ].map(([tableName, desc]) => (
               <div
@@ -1782,7 +1782,7 @@ export default function SuperAdminPage() {
             </h3>
             <form onSubmit={handleSaveTarget} className="mt-4 space-y-3.5 text-xs">
               <div>
-                <label className="font-bold text-slate-700">Nama Alat / Target Impian</label>
+                <label className="font-bold text-slate-700">Nama Alat / Mesin Kebun</label>
                 <input
                   type="text"
                   required
@@ -1856,7 +1856,7 @@ export default function SuperAdminPage() {
                   type="submit"
                   className="rounded-xl bg-emerald-600 px-5 py-2.5 font-extrabold text-white hover:bg-emerald-700 cursor-pointer"
                 >
-                  Simpan Target
+                  Simpan Tabungan Alat
                 </button>
               </div>
             </form>

@@ -11,7 +11,7 @@ import { getSupabase } from "@/lib/supabase/client";
  * 3. Smart Land & Smoke Scanner (AI Kamera Pemindai Lahan/Semak/Asap)
  * 4. Check-in Harian Bebas Api, Streak, & JagaLahan Benih Hijau (Reward Edukatif Saprotan)
  * 5. Pengingat Siaga Karhutla & Jadwal Lahan
- * 6. Target Lahan Impian (Goal Setting & Progress Bar)
+ * 6. Tabungan Alat Kebun (Goal Setting Celengan Tani & Progress Bar)
  * 7. Level Pengguna & Paket Langganan (Perintis Lahan Trial 30 Hari, Tani Mandiri, Poktan Cerdas)
  */
 
@@ -286,7 +286,7 @@ export function createInitialV2State(): JagaLahanV2State {
       {
         id: "tgt-1",
         title: "Mesin Pencacah Semak Pribadi",
-        subtitle: "Ayo terus kumpulkan penghematan tanpa bakar, alat impianmu pasti tercapai!",
+        subtitle: "Ayo terus kumpulkan penghematan tanpa bakar, alat kebun idamanmu segera terbeli!",
         targetAmount: 8_000_000,
         savedAmount: 5_200_000,
         monthlySaving: 500_000,
