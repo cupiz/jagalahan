@@ -40,7 +40,7 @@ const NAV_ITEMS = [
   { href: "/beranda", label: "Dashboard (Beranda)", shortLabel: "Beranda", icon: Home, badge: "Utama" },
   { href: "/tracking", label: "Tracking & Laporan PDF", shortLabel: "Tracking", icon: FileSpreadsheet, badge: "Log" },
   { href: "/scanner", label: "Smart Land Scanner", shortLabel: "Scanner", icon: ScanLine, badge: "AI Poktan" },
-  { href: "/koin", label: "Check-in & Benih Hijau", shortLabel: "Benih", icon: Coins, badge: "+Benih" },
+  { href: "/benih", label: "Check-in & Benih Hijau", shortLabel: "Benih", icon: Coins, badge: "+Benih" },
   { href: "/pengingat", label: "Pengingat Siaga", shortLabel: "Pengingat", icon: Bell, badge: "Trigger" },
   { href: "/target", label: "Tabungan Alat Kebun", shortLabel: "Tabungan", icon: Target, badge: "Alat" },
   { href: "/paket", label: "Pilihan Paket Edukatif", shortLabel: "Paket", icon: Crown, badge: "Tier" },
