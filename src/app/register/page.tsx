@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -28,7 +28,7 @@ const ROLES: {
     id: "petani",
     code: "ROLE 01",
     title: "Petani / Pekebun Lahan",
-    desc: "Kelola pembukaan lahan tanpa bakar, scan biomassa AI, catat surplus kas & klaim koin harian.",
+    desc: "Kelola pembukaan lahan tanpa bakar, scan biomassa AI, catat surplus kas & klaim Benih Hijau harian.",
     icon: Sprout,
   },
   {
@@ -127,10 +127,10 @@ export default function RegisterPage() {
                 [01 / REGISTRASI LAHAN & PERAN]
               </div>
               <h1 className="text-3xl sm:text-4xl font-bold tracking-[-0.03em] text-slate-900 leading-[1.08]">
-                Mulai 14 Hari Tanpa Bakar.
+                Mulai 30 Hari Tanpa Bakar.
               </h1>
               <p className="mt-2.5 text-sm text-slate-600 max-w-lg leading-relaxed">
-                Daftarkan identitas lahan dan pilih peran Anda dalam ekosistem pencegahan Karhutla. Gratis 14 hari pertama tanpa syarat kartu.
+                Daftarkan identitas lahan dan pilih peran Anda dalam ekosistem pencegahan Karhutla. Gratis 30 hari pertama tanpa syarat kartu kredit.
               </p>
 
               <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -232,9 +232,9 @@ export default function RegisterPage() {
               </div>
               <div className="grid grid-cols-3 gap-2.5">
                 {[
-                  { id: "trial" as PlanTier, name: "TRIAL 14 HARI", price: "Rp 0" },
-                  { id: "pro" as PlanTier, name: "PRO BULANAN", price: "Rp 9.900" },
-                  { id: "vip" as PlanTier, name: "VIP KELOMPOK", price: "Rp 19.900" },
+                  { id: "trial" as PlanTier, name: "PERINTIS LAHAN", price: "Rp 0 (30 Hari)" },
+                  { id: "pro" as PlanTier, name: "TANI MANDIRI", price: "Rp 10.999" },
+                  { id: "vip" as PlanTier, name: "POKTAN CERDAS (AI)", price: "Rp 19.000" },
                 ].map((tier) => {
                   const active = plan === tier.id;
                   return (
@@ -338,7 +338,7 @@ export default function RegisterPage() {
       {/* Bottom Status Bar */}
       <footer className="relative z-10 border-t border-slate-200 px-6 sm:px-10 h-14 flex items-center justify-between text-[11px] font-mono text-slate-400">
         <span>JAGALAHAN.WEB.ID // ZERO-BURN ONBOARDING</span>
-        <span>TRIAL 14 HARI GRATIS • TANPA KARTU KREDIT</span>
+        <span>PERINTIS LAHAN (TRIAL 30 HARI GRATIS) • TANPA KARTU KREDIT</span>
       </footer>
     </div>
   );

@@ -27,6 +27,7 @@ import {
   setUserRole,
   setPlanTier,
   ROLE_LABELS,
+  PLAN_LABELS,
   addManagedUser,
   updateManagedUser,
   deleteManagedUser,
@@ -626,11 +627,11 @@ export default function SuperAdminPage() {
 
           <div className="rounded-2xl border border-slate-200/80 bg-slate-50/70 p-4">
             <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-              <span>KOIN HIJAU & PENGINGAT</span>
-              <Coins className="h-4 w-4 text-amber-600" />
+              <span>BENIH HIJAU & PENGINGAT</span>
+              <Coins className="h-4 w-4 text-emerald-600" />
             </div>
-            <p className="mt-1.5 text-2xl font-black text-amber-700">
-              {formatNumber(totalCoinsAll, 0)} Koin
+            <p className="mt-1.5 text-2xl font-black text-emerald-700">
+              {formatNumber(totalCoinsAll, 0)} Benih
             </p>
             <p className="mt-0.5 text-xs font-semibold text-slate-600">
               {state.reminders.length} Pengingat • {state.redemptions.length} Penukaran
@@ -647,7 +648,7 @@ export default function SuperAdminPage() {
             ["transactions", "2. Data Transaksi Lahan", FileSpreadsheet, state.transactions.length],
             ["scans", "3. Data Smart Scanner AI", Camera, state.scans.length],
             ["targets", "4. Data Target Impian", Target, state.targets.length],
-            ["reminders", "5. Pengingat & Koin Hijau", Bell, state.reminders.length + state.redemptions.length],
+            ["reminders", "5. Pengingat & Benih Hijau", Bell, state.reminders.length + state.redemptions.length],
             ["cloud", "6. Database Cloud Supabase", Database, 6],
           ] as [AdminTab, string, React.ElementType, number][]
         ).map(([tabKey, label, Icon, count]) => {
@@ -688,7 +689,7 @@ export default function SuperAdminPage() {
                 Manajemen Pengguna, Role & Paket Langganan
               </h2>
               <p className="text-xs text-slate-500">
-                Super Admin dapat mengubah role, paket (Trial/Pro/VIP), luas lahan, saldo koin, atau
+                Super Admin dapat mengubah role, paket edukatif (Perintis Lahan / Tani Mandiri / Poktan Cerdas), luas lahan, saldo Benih Hijau, atau
                 masuk sebagai pengguna tertentu.
               </p>
             </div>
@@ -737,8 +738,8 @@ export default function SuperAdminPage() {
                   <th className="px-4 py-3.5">Pengguna & Email</th>
                   <th className="px-4 py-3.5">Role Ekosistem</th>
                   <th className="px-4 py-3.5">Wilayah & Lahan</th>
-                  <th className="px-4 py-3.5">Paket</th>
-                  <th className="px-4 py-3.5">Koin & Streak</th>
+                  <th className="px-4 py-3.5">Paket Langganan</th>
+                  <th className="px-4 py-3.5">Benih & Streak</th>
                   <th className="px-4 py-3.5">Status</th>
                   <th className="px-4 py-3.5 text-right">Aksi Admin</th>
                 </tr>
@@ -780,7 +781,7 @@ export default function SuperAdminPage() {
                       </td>
                       <td className="px-4 py-3.5">
                         <span
-                          className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-extrabold uppercase ${
+                          className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-extrabold ${
                             u.plan === "vip"
                               ? "bg-amber-100 text-amber-900"
                               : u.plan === "pro"
@@ -789,12 +790,12 @@ export default function SuperAdminPage() {
                           }`}
                         >
                           <Crown className="h-3 w-3" />
-                          {u.plan}
+                          {PLAN_LABELS[u.plan]}
                         </span>
                       </td>
                       <td className="px-4 py-3.5">
-                        <p className="font-extrabold text-amber-700">
-                          {formatNumber(u.coins, 0)} Koin
+                        <p className="font-extrabold text-emerald-700">
+                          {formatNumber(u.coins, 0)} Benih
                         </p>
                         <p className="text-[11px] text-slate-500">Streak {u.streakDays} hari</p>
                       </td>
@@ -1136,22 +1137,22 @@ export default function SuperAdminPage() {
       )}
 
       {/* =====================================================================
-          TAB 5: MANAJEMEN PENGINGAT SIAGA & KOIN HIJAU (FULL CRUD)
+          TAB 5: MANAJEMEN PENGINGAT SIAGA & BENIH HIJAU (FULL CRUD)
          ===================================================================== */}
       {activeTab === "reminders" && (
         <div className="space-y-6">
-          {/* Quick Editor Saldo Koin & Streak Akun Aktif */}
-          <div className="rounded-3xl border border-amber-200 bg-amber-50/60 p-6">
+          {/* Quick Editor Saldo Benih & Streak Akun Aktif */}
+          <div className="rounded-3xl border border-emerald-200 bg-emerald-50/60 p-6">
             <h2 className="text-base font-black text-slate-900">
-              Kendali Cepat Saldo JagaLahan Coins & Streak (Akun Aktif: {state.userName})
+              Kendali Cepat Saldo Benih Hijau & Streak (Akun Aktif: {state.userName})
             </h2>
             <p className="text-xs text-slate-600">
-              Ubah langsung jumlah Koin Hijau atau Streak Hari Bebas Api untuk pengujian reward dan gamifikasi.
+              Ubah langsung jumlah Benih Hijau atau Streak Hari Bebas Api untuk pengujian reward dan gamifikasi.
             </p>
             <div className="mt-4 flex flex-wrap items-end gap-3">
               <div>
                 <label className="block text-[11px] font-extrabold uppercase text-slate-600">
-                  Saldo Koin Hijau
+                  Saldo Benih Hijau
                 </label>
                 <input
                   type="number"
@@ -1180,11 +1181,11 @@ export default function SuperAdminPage() {
                     coins: Number(quickCoins) || 0,
                     streakDays: Number(quickStreak) || 0,
                   });
-                  notify("Saldo Koin & Streak berhasil diperbarui oleh Super Admin!");
+                  notify("Saldo Benih & Streak berhasil diperbarui oleh Super Admin!");
                 }}
-                className="rounded-xl bg-amber-600 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-amber-700 cursor-pointer"
+                className="rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-extrabold text-white hover:bg-emerald-700 cursor-pointer"
               >
-                Terapkan Koin & Streak
+                Terapkan Benih & Streak
               </button>
             </div>
           </div>
@@ -1261,14 +1262,14 @@ export default function SuperAdminPage() {
               </div>
             </div>
 
-            {/* Daftar Penukaran Voucher Koin */}
+            {/* Daftar Penukaran Voucher Benih Hijau */}
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-base font-black text-slate-900">
                     Riwayat Penukaran Voucher ({state.redemptions.length})
                   </h3>
-                  <p className="text-xs text-slate-500">Log penukaran JagaLahan Coins petani</p>
+                  <p className="text-xs text-slate-500">Log penukaran Benih Hijau petani</p>
                 </div>
                 <button
                   type="button"
@@ -1290,7 +1291,7 @@ export default function SuperAdminPage() {
                       <p className="text-xs font-extrabold text-slate-900">{red.title}</p>
                       <p className="mt-0.5 text-[11px] text-slate-500">
                         {red.date} •{" "}
-                        <strong className="text-amber-700">-{red.coinsUsed} Koin</strong> (Senilai{" "}
+                        <strong className="text-emerald-700">-{red.coinsUsed} Benih</strong> (Senilai{" "}
                         {formatRupiah(red.rupiahValue)})
                       </p>
                     </div>
@@ -1364,7 +1365,7 @@ export default function SuperAdminPage() {
               ["v2_smart_scans", "Tabel Smart Scanner AI (EXIF Stripped)"],
               ["v2_reminders", "Tabel Pengingat Siaga Karhutla"],
               ["v2_dream_targets", "Tabel Target Lahan Impian"],
-              ["v2_reward_redemptions", "Tabel Penukaran Voucher Koin"],
+              ["v2_reward_redemptions", "Tabel Penukaran Voucher Benih Hijau"],
             ].map(([tableName, desc]) => (
               <div
                 key={tableName}
@@ -1398,7 +1399,7 @@ export default function SuperAdminPage() {
                       <th className="px-4 py-3">Desa / Wilayah</th>
                       <th className="px-4 py-3">Luas (Ha)</th>
                       <th className="px-4 py-3">Paket</th>
-                      <th className="px-4 py-3">Koin</th>
+                      <th className="px-4 py-3">Benih</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 bg-white">
@@ -1486,9 +1487,9 @@ export default function SuperAdminPage() {
                     onChange={(e) => setUPlan(e.target.value as PlanTier)}
                     className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-900"
                   >
-                    <option value="trial">Trial 14 Hari</option>
-                    <option value="pro">Paket Pro</option>
-                    <option value="vip">Paket VIP</option>
+                    <option value="trial">Perintis Lahan (Trial 30 Hari)</option>
+                    <option value="pro">Paket Tani Mandiri (Rp10.999/bln)</option>
+                    <option value="vip">Paket Poktan Cerdas (AI) (Rp19.000/bln)</option>
                   </select>
                 </div>
               </div>
@@ -1519,7 +1520,7 @@ export default function SuperAdminPage() {
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700">Saldo Koin</label>
+                  <label className="font-bold text-slate-700">Saldo Benih Hijau</label>
                   <input
                     type="number"
                     min={0}
@@ -1959,7 +1960,7 @@ export default function SuperAdminPage() {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700">Koin Terpakai</label>
+                  <label className="font-bold text-slate-700">Benih Hijau Terpakai</label>
                   <input
                     type="number"
                     required

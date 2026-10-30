@@ -85,7 +85,7 @@ export default function BerandaPage() {
     setTxTitle("");
     setTxNote("");
     setShowAddModal(false);
-    setToast("Catatan lahan berhasil disimpan! (+5 Koin Hijau)");
+    setToast("Catatan lahan berhasil disimpan! (+10 Benih Hijau)");
     setTimeout(() => setToast(null), 3500);
   };
 
@@ -130,11 +130,11 @@ export default function BerandaPage() {
             className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs font-bold transition shadow-sm ${
               checkedInToday
                 ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300"
-                : "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:brightness-105"
+                : "bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:brightness-105"
             }`}
           >
             <Coins className="h-4 w-4" />
-            {checkedInToday ? "Sudah Check-in Hari Ini (+10 Koin)" : "Check-in Bebas Api (+10 Koin)"}
+            {checkedInToday ? "Sudah Check-in Hari Ini (+15 Benih)" : "Check-in Bebas Api (+15 Benih)"}
           </button>
 
           <button
@@ -216,15 +216,15 @@ export default function BerandaPage() {
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700 dark:bg-indigo-950/70 dark:text-indigo-300">
                 <Crown className="h-3.5 w-3.5 text-amber-500" />
-                Fitur Eksklusif VIP
+                Fitur Eksklusif AI Poktan
               </span>
               {state.plan === "vip" ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300">
-                  Aktif (VIP)
+                  Aktif (Poktan Cerdas)
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-800 dark:bg-amber-950/70 dark:text-amber-300">
-                  <Lock className="h-3 w-3" /> Terkunci ({state.plan.toUpperCase()})
+                  <Lock className="h-3 w-3" /> Perlu Paket Poktan Cerdas
                 </span>
               )}
             </div>
@@ -270,7 +270,7 @@ export default function BerandaPage() {
                   className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 px-3.5 py-2 text-xs font-bold text-white shadow-sm hover:bg-amber-600"
                 >
                   <Lock className="h-3.5 w-3.5" />
-                  Buka VIP
+                  Buka Paket AI
                 </Link>
               </div>
             )}
@@ -483,24 +483,24 @@ export default function BerandaPage() {
           </div>
         </div>
 
-        {/* Pengingat & Koin Shortcut (4 cols) */}
+        {/* Pengingat & Benih Hijau Shortcut (4 cols) */}
         <div className="space-y-6 lg:col-span-4">
-          <div className="rounded-3xl bg-gradient-to-br from-amber-500 to-orange-500 p-5 text-white shadow-md">
+          <div className="rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-700 p-5 text-white shadow-md">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-100">
-                JagaLahan Coins
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-100">
+                Benih Hijau JagaLahan
               </span>
-              <Coins className="h-5 w-5 text-amber-100" />
+              <Sprout className="h-5 w-5 text-emerald-200" />
             </div>
-            <p className="mt-1 text-2xl font-extrabold">{state.coins.toLocaleString("id-ID")} Koin</p>
-            <p className="mt-1 text-xs text-amber-50">
-              Setara Rp{((state.coins / 1000) * 10000).toLocaleString("id-ID")} voucher bibit/pupuk organik
+            <p className="mt-1 text-2xl font-extrabold">{state.coins.toLocaleString("id-ID")} Benih</p>
+            <p className="mt-1 text-xs text-emerald-100">
+              Dapat ditukar voucher bibit, dekomposer EM4 & saprotan ramah lingkungan
             </p>
             <Link
               href="/koin"
-              className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-2xl bg-white px-4 py-2.5 text-xs font-bold text-amber-700 shadow-sm transition hover:bg-amber-50"
+              className="mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-2xl bg-white px-4 py-2.5 text-xs font-bold text-emerald-800 shadow-sm transition hover:bg-emerald-50"
             >
-              Tukar Koin & Check-in <ArrowRight className="h-3.5 w-3.5" />
+              Tukar Benih & Check-in <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
@@ -651,7 +651,7 @@ export default function BerandaPage() {
                   type="submit"
                   className="rounded-xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-emerald-700"
                 >
-                  Simpan Catatan (+5 Koin)
+                  Simpan Catatan (+10 Benih)
                 </button>
               </div>
             </form>

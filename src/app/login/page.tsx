@@ -37,8 +37,8 @@ const DEMO_ACCOUNTS: {
     redirectTo: "/admin",
   },
   {
-    label: "Iqbal — Petani Mandiri (VIP)",
-    sub: "Akses penuh: Smart Land Scanner AI + Laporan PDF + Koin",
+    label: "Iqbal — Petani Mandiri (Paket Poktan Cerdas)",
+    sub: "Akses penuh: Smart Land Scanner AI + Ekspor PDF + Benih Hijau",
     name: "Iqbal",
     email: "iqbal@jagalahan.web.id",
     role: "petani",
@@ -47,8 +47,8 @@ const DEMO_ACCOUNTS: {
     landAreaHa: 2.0,
   },
   {
-    label: "Pak Hendra — Ketua Kelompok Tani (Pro)",
-    sub: "Koordinator koperasi desa, verifikasi PDF & penukaran voucher koin",
+    label: "Pak Hendra — Ketua Kelompok Tani (Paket Tani Mandiri)",
+    sub: "Koordinator koperasi desa, verifikasi PDF & subsidi Benih Hijau",
     name: "Pak Hendra",
     email: "hendra.poktan@jagalahan.web.id",
     role: "kelompok_tani",
@@ -57,8 +57,8 @@ const DEMO_ACCOUNTS: {
     landAreaHa: 15.0,
   },
   {
-    label: "Budi Santoso — Petani Baru (Trial 14 Hari)",
-    sub: "Uji coba gratis 14 hari tanpa kartu kredit (Tracking, Koin, Pengingat)",
+    label: "Budi Santoso — Petani Baru (Perintis Lahan Trial 30 Hari)",
+    sub: "Uji coba gratis 30 hari tanpa kartu kredit (Tracking, Benih, Pengingat)",
     name: "Budi Santoso",
     email: "budi.tani@jagalahan.web.id",
     role: "petani",
@@ -253,7 +253,7 @@ export default function LoginPage() {
                 <strong>Petani/Pekebun</strong>, <strong>Pengurus Kelompok Tani</strong>, atau{" "}
                 <strong>Penyuluh MPA</strong>. Belum memiliki akun?{" "}
                 <Link href="/register" className="font-bold text-emerald-700 hover:underline">
-                  Daftar Trial 14 Hari Gratis →
+                  Daftar Perintis Lahan (Trial 30 Hari Gratis) →
                 </Link>
               </p>
             </div>

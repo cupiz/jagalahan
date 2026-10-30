@@ -24,6 +24,7 @@ import {
 import { Dialog } from "@/components/ui/dialog";
 import {
   logoutUser,
+  PLAN_LABELS,
   ROLE_LABELS,
   setPlanTier,
   setUserRole,
@@ -38,11 +39,11 @@ import { cn, formatNumber } from "@/lib/utils";
 const NAV_ITEMS = [
   { href: "/beranda", label: "Dashboard (Beranda)", shortLabel: "Beranda", icon: Home, badge: "Utama" },
   { href: "/tracking", label: "Tracking & Laporan PDF", shortLabel: "Tracking", icon: FileSpreadsheet, badge: "Log" },
-  { href: "/scanner", label: "Smart Land Scanner", shortLabel: "Scanner", icon: ScanLine, badge: "VIP AI" },
-  { href: "/koin", label: "Check-in & Koin Hijau", shortLabel: "Koin", icon: Coins, badge: "+Reward" },
+  { href: "/scanner", label: "Smart Land Scanner", shortLabel: "Scanner", icon: ScanLine, badge: "AI Poktan" },
+  { href: "/koin", label: "Check-in & Benih Hijau", shortLabel: "Benih", icon: Coins, badge: "+Benih" },
   { href: "/pengingat", label: "Pengingat Siaga", shortLabel: "Pengingat", icon: Bell, badge: "Trigger" },
   { href: "/target", label: "Target Lahan Impian", shortLabel: "Target", icon: Target, badge: "Goal" },
-  { href: "/paket", label: "Paket Trial / Pro / VIP", shortLabel: "Paket", icon: Crown, badge: "Tier" },
+  { href: "/paket", label: "Pilihan Paket Edukatif", shortLabel: "Paket", icon: Crown, badge: "Tier" },
   { href: "/profil", label: "Profil & Privasi UU PDP", shortLabel: "Profil", icon: ShieldCheck, badge: "Aman" },
   { href: "/admin", label: "Panel Super Admin", shortLabel: "Admin", icon: ShieldAlert, badge: "CRUD" },
 ];
@@ -51,15 +52,9 @@ const MOBILE_TABS = [
   NAV_ITEMS[0], // Beranda
   NAV_ITEMS[1], // Tracking
   NAV_ITEMS[2], // Scanner
-  NAV_ITEMS[3], // Koin
+  NAV_ITEMS[3], // Benih
   NAV_ITEMS[5], // Target
 ];
-
-const PLAN_LABELS: Record<PlanTier, string> = {
-  trial: "Trial 14 Hari",
-  pro: "Paket Pro",
-  vip: "Paket VIP",
-};
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -117,15 +112,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </Link>
 
-          {/* Kartu Ringkas Koin & Streak di Sidebar */}
+          {/* Kartu Ringkas Benih Hijau & Streak di Sidebar */}
           <div className="mt-4 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-blue-600 p-3.5 text-white shadow-lg shadow-emerald-600/20">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-emerald-100">Saldo JagaLahan Coins</span>
+              <span className="font-bold text-emerald-100">Saldo Benih Hijau</span>
               <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-extrabold">
                 Streak {state.streakDays} Hari
               </span>
             </div>
-            <p className="mt-1 text-xl font-black tabular-nums">{formatNumber(state.coins, 0)} Koin</p>
+            <p className="mt-1 text-xl font-black tabular-nums">{formatNumber(state.coins, 0)} Benih</p>
             <p className="mt-0.5 truncate text-[11px] text-emerald-100">
               {ROLE_LABELS[state.userRole]} • {state.villageName}
             </p>
@@ -256,13 +251,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <span className="hidden sm:inline">{state.privacyMask ? "Nominal Tersembunyi" : "Privacy Mode"}</span>
               </button>
 
-              {/* Saldo Koin Cepat */}
+              {/* Saldo Benih Hijau Cepat */}
               <Link
                 href="/koin"
                 className="inline-flex items-center gap-1.5 rounded-xl bg-amber-50 px-3 py-1.5 text-xs font-extrabold text-amber-800 ring-1 ring-amber-200 hover:bg-amber-100"
               >
                 <Coins className="size-3.5 text-amber-600" />
-                <span className="tabular-nums">{formatNumber(state.coins, 0)} Koin</span>
+                <span className="tabular-nums">{formatNumber(state.coins, 0)} Benih</span>
               </Link>
 
               {/* Pemilih Level Trial / Pro / VIP */}
@@ -350,7 +345,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               {(
                 [
                   ["admin", "Super Admin (Administrator Sistem)", "Akses penuh melihat, menambah, mengedit & menghapus seluruh data pengguna, transaksi, scan AI, target, pengingat & cloud."],
-                  ["petani", "Petani / Pekebun Lahan", "Fokus pencatatan pembukaan lahan tanpa bakar, kalkulasi penghematan pupuk NPK, dan klaim koin harian."],
+                  ["petani", "Petani / Pekebun Lahan", "Fokus pencatatan pembukaan lahan tanpa bakar, kalkulasi penghematan pupuk NPK, dan klaim Benih Hijau harian."],
                   ["kelompok_tani", "Pengurus Kelompok Tani / Koperasi", "Fokus manajemen kas kolektif, progres tabungan alat mekanis bersama (pencacah/pompa), & audit PDF."],
                   ["penyuluh", "Penyuluh / Relawan MPA", "Fokus pemantauan tinggi muka air gambut, kesiagaan sekat bakar, dan mitigasi risiko titik panas desa."],
                 ] as [UserRole, string, string][]
@@ -382,18 +377,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 [
                   [
                     "trial",
-                    "Trial 14 Hari (Gratis)",
-                    "Akses Tracking Lahan, Pengingat Siaga, & Check-in Harian. Fitur Target Impian, Unduh PDF, & Smart Scanner terkunci.",
+                    "Perintis Lahan (Trial 30 Hari Gratis)",
+                    "Akses Tracking Lahan, Pengingat Siaga, & Check-in Harian Bebas Api selama 30 hari penuh. Fitur Target Impian, Ekspor PDF, & Smart Scanner AI terkunci.",
                   ],
                   [
                     "pro",
-                    "Paket Pro (Rp9.900 / bulan)",
-                    "Membuka Koin & Reward, Target Lahan Impian, serta Laporan & Unduh PDF.",
+                    "Paket Tani Mandiri (Rp10.999 / bulan)",
+                    "Membuka akumulasi Benih Hijau & katalog subsidi Saprotan, Target Lahan Impian, serta Ekspor Laporan PDF.",
                   ],
                   [
                     "vip",
-                    "Paket VIP (Rp19.900 / bulan)",
-                    "Mencakup seluruh fitur Pro ditambah akses eksklusif ke Smart Land & Smoke Scanner berbasis AI.",
+                    "Paket Poktan Cerdas (AI) (Rp19.000 / bulan)",
+                    "Mencakup seluruh fitur Tani Mandiri ditambah akses tanpa batas Smart Land & Smoke Scanner berbasis AI.",
                   ],
                 ] as const
               ).map(([tier, title, desc]) => (

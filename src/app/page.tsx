@@ -43,8 +43,8 @@ const SYSTEM_INDEX = [
   {
     idx: "03",
     code: "REWARD & SOCIAL PROOF",
-    title: "Check-in & Koin Hijau",
-    desc: "Klaim koin harian bebas asap dan tukar voucher pupuk organik di KUD.",
+    title: "Check-in & Benih Hijau",
+    desc: "Klaim Benih Hijau harian bebas asap dan tukar subsidi pupuk organik di Kios Tani Desa.",
     metric: "18 Hari Streak",
     href: "/koin",
     icon: Coins,
@@ -83,7 +83,7 @@ const ROLES_FLOW = [
     code: "ROLE 01",
     title: "Petani / Pekebun Lahan",
     focus: "Eksekusi Lahan Tanpa Bakar",
-    flow: "Scan foto semak → terima resep EM4 & kompos → catat penghematan pupuk NPK → klaim Koin Hijau harian.",
+    flow: "Scan foto semak → terima resep EM4 & kompos → catat penghematan pupuk NPK → klaim Benih Hijau harian.",
     badge: "Pengguna Utama",
     icon: Sprout,
   },
@@ -224,7 +224,7 @@ export default function LandingPage() {
               </h1>
 
               <p className="mt-6 text-base sm:text-lg text-slate-600 max-w-xl leading-relaxed font-normal">
-                Platform pembukaan lahan tanpa bakar yang mengubah semak gambut menjadi tabungan pupuk NPK, koin reward harian, dan alat mekanis kelompok tani.
+                Platform pembukaan lahan tanpa bakar yang mengubah semak gambut menjadi tabungan pupuk NPK, reward Benih Hijau harian, dan alat mekanis kelompok tani.
               </p>
 
               <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -232,7 +232,7 @@ export default function LandingPage() {
                   href="/register"
                   className="px-6 py-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs font-mono uppercase tracking-[0.18em] shadow-md shadow-emerald-600/20 transition-all inline-flex items-center gap-2"
                 >
-                  <span>Mulai Trial 14 Hari</span>
+                  <span>Mulai Trial 30 Hari</span>
                   <ArrowUpRight className="w-4 h-4" />
                 </Link>
                 <Link
@@ -413,7 +413,7 @@ export default function LandingPage() {
                       TUNNELING ALAT MEKANIS
                     </span>
                     <span className="font-mono text-[10px] text-emerald-700 font-semibold">
-                      520 KOIN HIJAU
+                      680 BENIH HIJAU
                     </span>
                   </div>
 
@@ -698,7 +698,7 @@ export default function LandingPage() {
               {
                 step: "STEP 01",
                 title: "Registrasi & Pilih Peran",
-                desc: "Daftar Trial 14 Hari gratis sebagai Petani, Kelompok Tani, atau Penyuluh MPA.",
+                desc: "Daftar Perintis Lahan (Trial 30 Hari gratis) sebagai Petani, Kelompok Tani, atau Penyuluh MPA.",
               },
               {
                 step: "STEP 02",
@@ -707,8 +707,8 @@ export default function LandingPage() {
               },
               {
                 step: "STEP 03",
-                title: "Catat Kas & Klaim Koin",
-                desc: "Rekam penghematan NPK di Tracking dan check-in harian bebas asap (+Koin).",
+                title: "Catat Kas & Klaim Benih",
+                desc: "Rekam penghematan NPK di Tracking dan check-in harian bebas asap (+Benih Hijau).",
               },
               {
                 step: "STEP 04",
@@ -758,9 +758,9 @@ export default function LandingPage() {
             {[
               {
                 code: "TIER 01 // ONBOARDING",
-                name: "Trial 14 Hari",
+                name: "Perintis Lahan (Trial 30 Hari)",
                 price: "Rp 0",
-                period: "14 hari pertama",
+                period: "30 hari pertama",
                 features: [
                   "Dashboard Kas & Surplus Lahan",
                   "Jurnal Tracking Tanpa Bakar",
@@ -773,31 +773,31 @@ export default function LandingPage() {
               },
               {
                 code: "TIER 02 // PETANI AKTIF",
-                name: "Paket Pro",
-                price: "Rp 9.900",
+                name: "Paket Tani Mandiri",
+                price: "Rp 10.999",
                 period: "per bulan",
                 features: [
-                  "Semua fitur Trial 14 Hari",
-                  "Klaim Koin Hijau & Voucher Pupuk KUD",
+                  "Semua fitur Perintis Lahan 30 Hari",
+                  "Klaim Benih Hijau & Subsidi Saprotan",
                   "Target Tabungan Alat Mekanis",
                   "Ekspor Laporan Audit PDF Resmi",
                 ],
-                cta: "Pilih Paket Pro",
+                cta: "Pilih Tani Mandiri",
                 href: "/register",
                 highlight: false,
               },
               {
                 code: "TIER 03 // FULL AI VISION",
-                name: "Paket VIP",
-                price: "Rp 19.900",
+                name: "Paket Poktan Cerdas (AI)",
+                price: "Rp 19.000",
                 period: "per bulan",
                 features: [
-                  "Semua fitur Paket Pro",
+                  "Semua fitur Paket Tani Mandiri",
                   "Smart Land & Smoke Scanner AI",
                   "Kalkulasi Otomatis Kompos & Dosis EM4",
-                  "Prioritas Subsidi & Verifikasi Kelompok",
+                  "Bonus +35 Benih Hijau Tiap Scan",
                 ],
-                cta: "Aktifkan VIP Sekarang",
+                cta: "Pilih Poktan Cerdas",
                 href: "/register",
                 highlight: true,
               },

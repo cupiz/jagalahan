@@ -37,7 +37,7 @@ export default function TargetPage() {
   const handleAddSaving = (id: string, targetTitle: string, amount: number) => {
     addSavingToTarget(id, amount);
     setToast(
-      `Berhasil menambah alokasi ${formatRupiah(amount)} ke "${targetTitle}"! (+10 Koin Hijau)`,
+      `Berhasil menambah alokasi ${formatRupiah(amount)} ke "${targetTitle}"! (+20 Benih Hijau)`,
     );
     setTimeout(() => setToast(null), 3500);
   };

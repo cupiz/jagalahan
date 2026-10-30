@@ -9,10 +9,10 @@ import { getSupabase } from "@/lib/supabase/client";
  * 1. Autentikasi & Peran Pengguna (Petani, Pengurus Kelompok Tani, Penyuluh MPA)
  * 2. Tracking Lahan Tanpa Bakar (Manfaat & Biaya Kelola) + Unduh Laporan PDF
  * 3. Smart Land & Smoke Scanner (AI Kamera Pemindai Lahan/Semak/Asap)
- * 4. Check-in Harian Bebas Api, Streak, & JagaLahan Coins (Koin Hijau + Tukar Reward)
+ * 4. Check-in Harian Bebas Api, Streak, & JagaLahan Benih Hijau (Reward Edukatif Saprotan)
  * 5. Pengingat Siaga Karhutla & Jadwal Lahan
  * 6. Target Lahan Impian (Goal Setting & Progress Bar)
- * 7. Level Pengguna & Paket Langganan (Trial 14 Hari, Pro, VIP)
+ * 7. Level Pengguna & Paket Langganan (Perintis Lahan Trial 30 Hari, Tani Mandiri, Poktan Cerdas)
  */
 
 export type PlanTier = "trial" | "pro" | "vip";
@@ -31,6 +31,12 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   kelompok_tani: "Pengurus Kelompok Tani",
   penyuluh: "Penyuluh / Relawan MPA",
   admin: "Super Admin (Administrator)",
+};
+
+export const PLAN_LABELS: Record<PlanTier, string> = {
+  trial: "Perintis Lahan (Trial 30 Hari)",
+  pro: "Paket Tani Mandiri (Rp10.999/bln)",
+  vip: "Paket Poktan Cerdas (AI) (Rp19.000/bln)",
 };
 
 export interface ManagedUser {
@@ -136,8 +142,8 @@ export function createInitialV2State(): JagaLahanV2State {
     plan: "vip",
     privacyMask: false,
     darkMode: false,
-    coins: 1250,
-    streakDays: 12,
+    coins: 680,
+    streakDays: 9,
     lastCheckInDate: null,
     managedUsers: [
       {
@@ -148,7 +154,7 @@ export function createInitialV2State(): JagaLahanV2State {
         villageName: "Pusat Komando Karhutla Kalteng",
         landAreaHa: 50.0,
         plan: "vip",
-        coins: 9999,
+        coins: 5000,
         streakDays: 30,
         status: "Aktif",
         joinedAt: "2026-10-01",
@@ -161,8 +167,8 @@ export function createInitialV2State(): JagaLahanV2State {
         villageName: "Desa Kalampangan, Palangka Raya",
         landAreaHa: 2.0,
         plan: "vip",
-        coins: 1250,
-        streakDays: 12,
+        coins: 680,
+        streakDays: 9,
         status: "Aktif",
         joinedAt: "2026-10-10",
       },
@@ -174,8 +180,8 @@ export function createInitialV2State(): JagaLahanV2State {
         villageName: "Koperasi Tani Sabangau Hijau",
         landAreaHa: 15.0,
         plan: "pro",
-        coins: 3400,
-        streakDays: 21,
+        coins: 1850,
+        streakDays: 18,
         status: "Aktif",
         joinedAt: "2026-10-12",
       },
@@ -187,8 +193,8 @@ export function createInitialV2State(): JagaLahanV2State {
         villageName: "Desa Tumbang Nusa, Pulang Pisau",
         landAreaHa: 1.5,
         plan: "trial",
-        coins: 320,
-        streakDays: 5,
+        coins: 195,
+        streakDays: 4,
         status: "Aktif",
         joinedAt: "2026-10-18",
       },
@@ -200,8 +206,8 @@ export function createInitialV2State(): JagaLahanV2State {
         villageName: "Posko MPA Gohong, Pulang Pisau",
         landAreaHa: 8.5,
         plan: "vip",
-        coins: 2150,
-        streakDays: 19,
+        coins: 1120,
+        streakDays: 15,
         status: "Aktif",
         joinedAt: "2026-10-14",
       },
@@ -311,9 +317,9 @@ export function createInitialV2State(): JagaLahanV2State {
     redemptions: [
       {
         id: "red-1",
-        title: "Voucher Bibit Penutup Tanah & Dekomposer EM4",
-        coinsUsed: 1000,
-        rupiahValue: 10_000,
+        title: "Voucher Subsidi Dekomposer Hayati EM4 1 Liter",
+        coinsUsed: 450,
+        rupiahValue: 18_000,
         date: "2026-10-15",
       },
     ],
@@ -557,7 +563,7 @@ export function addTransaction(tx: Omit<LandTransaction, "id">) {
   const entry: LandTransaction = { ...tx, id: uid("tx") };
   saveState({
     ...s,
-    coins: s.coins + 5,
+    coins: s.coins + 10,
     transactions: [entry, ...s.transactions],
   });
 }
@@ -582,8 +588,8 @@ export function performDailyCheckIn(): { ok: boolean; bonusCoins: number; messag
     return { ok: false, bonusCoins: 0, message: "Kamu sudah Check-in hari ini! Kembali lagi besok ya." };
   }
   const nextStreak = s.streakDays + 1;
-  const milestoneBonus = nextStreak % 7 === 0 ? 25 : 0;
-  const earned = 10 + milestoneBonus;
+  const milestoneBonus = nextStreak % 7 === 0 ? 50 : 0;
+  const earned = 15 + milestoneBonus;
   saveState({
     ...s,
     coins: s.coins + earned,
@@ -595,12 +601,12 @@ export function performDailyCheckIn(): { ok: boolean; bonusCoins: number; messag
     bonusCoins: earned,
     message:
       milestoneBonus > 0
-        ? `Check-in Hari ke-${nextStreak} berhasil! +10 Koin + Bonus Streak ${milestoneBonus} Koin!`
-        : `Check-in berhasil! Kamu mendapatkan +10 Koin Hijau (Streak ${nextStreak} hari).`,
+        ? `Check-in Hari ke-${nextStreak} berhasil! +15 Benih Hijau + Bonus Konsistensi ${milestoneBonus} Benih!`
+        : `Check-in berhasil! Kamu mendapatkan +15 Benih Hijau (Streak ${nextStreak} hari bebas api).`,
   };
 }
 
-export function redeemCoins(title: string, coinsCost = 1000, rupiahValue = 10_000): boolean {
+export function redeemCoins(title: string, coinsCost = 450, rupiahValue = 18_000): boolean {
   const s = loadState();
   if (s.coins < coinsCost) return false;
   saveState({
@@ -671,7 +677,7 @@ export function addSavingToTarget(id: string, amount: number) {
   const s = loadState();
   saveState({
     ...s,
-    coins: s.coins + 10,
+    coins: s.coins + 20,
     targets: s.targets.map((t) =>
       t.id === id ? { ...t, savedAmount: Math.min(t.targetAmount, t.savedAmount + amount) } : t,
     ),
@@ -728,7 +734,7 @@ export function saveScanResult(scan: Omit<ScanRecord, "id" | "scannedAt" | "exif
   };
   saveState({
     ...s,
-    coins: s.coins + 15,
+    coins: s.coins + 35,
     scans: [entry, ...s.scans],
     transactions: [autoTx, ...s.transactions],
   });

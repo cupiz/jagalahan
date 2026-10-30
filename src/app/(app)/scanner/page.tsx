@@ -149,7 +149,7 @@ export default function ScannerPage() {
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-3 py-1 text-xs font-bold text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300">
               <Crown className="h-3.5 w-3.5 text-amber-500" />
-              Fitur Eksklusif VIP
+              Fitur Eksklusif AI Poktan
             </span>
             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">
               <ShieldCheck className="h-3.5 w-3.5" />
@@ -169,14 +169,14 @@ export default function ScannerPage() {
           <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/40">
             <Lock className="h-4 w-4 text-amber-600" />
             <span className="text-xs font-bold text-amber-900 dark:text-amber-200">
-              Mode {state.plan.toUpperCase()}: Pratinjau Aktif
+              Mode Pratinjau (Perlu Paket Poktan Cerdas)
             </span>
             <button
               type="button"
               onClick={() => setPlanTier("vip")}
               className="rounded-xl bg-amber-500 px-3 py-1.5 text-xs font-extrabold text-white hover:bg-amber-600"
             >
-              Aktifkan VIP Instan
+              Aktifkan Paket AI Instan
             </button>
           </div>
         )}
@@ -187,7 +187,7 @@ export default function ScannerPage() {
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5" />
             <span>
-              Hasil pemindaian berhasil disimpan ke Tracking Lahan! (+15 Koin Hijau ditambahkan)
+              Hasil pemindaian berhasil disimpan ke Tracking Lahan! (+35 Benih Hijau ditambahkan)
             </span>
           </div>
           <Link href="/tracking" className="underline">
@@ -410,7 +410,7 @@ export default function ScannerPage() {
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3.5 text-sm font-extrabold text-white shadow-md transition hover:brightness-105"
               >
                 <CheckCircle2 className="h-4 w-4" />
-                Konfirmasi dan Simpan ke Tracking (+15 Koin)
+                Konfirmasi dan Simpan ke Tracking (+35 Benih)
               </button>
             ) : (
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/40">
@@ -418,11 +418,10 @@ export default function ScannerPage() {
                   <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
                   <div>
                     <p className="text-xs font-bold text-amber-900 dark:text-amber-200">
-                      Penyimpanan Otomatis Smart Scanner Khusus Paket VIP
+                      Penyimpanan Otomatis Smart Scanner Khusus Paket Poktan Cerdas (AI)
                     </p>
                     <p className="mt-0.5 text-[11px] text-amber-800/90 dark:text-amber-300/80">
-                      Anda sedang menggunakan paket <strong>{state.plan.toUpperCase()}</strong>.
-                      Beralih ke VIP untuk menyimpan hasil scan otomatis ke Tracking Lahan.
+                      Beralih ke Paket Poktan Cerdas (AI) untuk menyimpan hasil scan otomatis ke Tracking Lahan dan klaim +35 Benih Hijau.
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <button
@@ -430,7 +429,7 @@ export default function ScannerPage() {
                         onClick={() => setPlanTier("vip")}
                         className="rounded-xl bg-amber-500 px-3.5 py-2 text-xs font-bold text-white hover:bg-amber-600"
                       >
-                        Coba Mode VIP Sekarang
+                        Coba Mode Poktan Cerdas Sekarang
                       </button>
                       <Link
                         href="/paket"

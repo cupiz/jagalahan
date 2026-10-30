@@ -24,51 +24,51 @@ const PLANS: {
 }[] = [
   {
     id: "trial",
-    name: "Trial 14 Hari",
-    badge: "Coba Gratis",
-    priceMonthly: "Gratis",
-    priceYearly: "Selama 14 Hari Pertama",
-    desc: "Cocok untuk petani & pengelola kebun yang baru memulai kebiasaan kelola lahan tanpa bakar.",
+    name: "Perintis Lahan (Trial 30 Hari)",
+    badge: "Coba 30 Hari Gratis",
+    priceMonthly: "Gratis Rp0",
+    priceYearly: "Akses Penuh Selama 30 Hari Pertama",
+    desc: "Cocok untuk petani & pekebun perintis yang baru membiasakan pembukaan lahan tanpa bakar.",
     features: [
       { label: "Tracking Lahan Manual (Manfaat & Biaya)", included: true },
-      { label: "Check-in Harian Bebas Api & Kumpulkan Koin", included: true },
-      { label: "Pengingat Harian & Jadwal Mulsa", included: true },
+      { label: "Check-in Harian Bebas Api & Kumpulkan Benih Hijau", included: true },
+      { label: "Pengingat Harian & Jadwal Mulsa Siaga Asap", included: true },
       { label: "Target Lahan Impian (Maks. 2 Target)", included: true },
-      { label: "Unduh Laporan PDF Resmi Zero-Burning", included: false },
+      { label: "Ekspor Laporan PDF Resmi Zero-Burning", included: false },
       { label: "Smart Land & Smoke Scanner (AI Kamera)", included: false },
     ],
   },
   {
     id: "pro",
-    name: "Paket Pro",
-    badge: "Populer untuk Kelompok Tani",
-    priceMonthly: "Rp9.900 / bulan",
-    priceYearly: "Rp99.900 / tahun (Hemat 16%)",
-    desc: "Pilihan tepat untuk pencatatan rutin tanpa batas dilengkapi ekspor Laporan PDF resmi.",
+    name: "Paket Tani Mandiri",
+    badge: "Paling Populer untuk Pekebun",
+    priceMonthly: "Rp10.999 / bulan",
+    priceYearly: "Rp109.000 / tahun (Hemat 17%)",
+    desc: "Solusi mandiri pencatatan kebun tanpa batas, pembukaan reward Benih Hijau, dan ekspor Laporan PDF.",
     features: [
-      { label: "Semua Fitur Paket Trial 14 Hari Tanpa Batas", included: true },
-      { label: "Unduh Laporan PDF Resmi Zero-Burning", included: true },
-      { label: "Filter Riwayat & Grafik Ringkasan Lengkap", included: true },
-      { label: "Target Lahan Impian Tanpa Batas", included: true },
-      { label: "Penukaran Koin Hijau ke Voucher Sarana Tani", included: true },
+      { label: "Semua Fitur Paket Perintis Lahan Tanpa Batas Waktu", included: true },
+      { label: "Ekspor Laporan PDF Resmi Standar GAP & Zero-Burning", included: true },
+      { label: "Filter Riwayat & Grafik Analitik Pertanian Lengkap", included: true },
+      { label: "Target Lahan Impian Tanpa Batas Alokasi", included: true },
+      { label: "Penukaran Benih Hijau ke Voucher Subsidi Saprotan", included: true },
       { label: "Smart Land & Smoke Scanner (AI Kamera)", included: false },
     ],
   },
   {
     id: "vip",
-    name: "Paket VIP",
+    name: "Paket Poktan Cerdas (AI)",
     badge: "Fitur Terlengkap + AI Scanner",
-    priceMonthly: "Rp19.900 / bulan",
-    priceYearly: "Rp199.900 / tahun (Hemat 16%)",
-    desc: "Otomatisasi penuh dengan Smart Land & Smoke Scanner berbasis AI Vision dan prioritas koin.",
+    priceMonthly: "Rp19.000 / bulan",
+    priceYearly: "Rp190.000 / tahun (Hemat 17%)",
+    desc: "Otomatisasi total dengan Smart Land & Smoke Scanner berbasis AI Vision untuk Poktan dan perkebunan produktif.",
     highlight: true,
     features: [
-      { label: "Semua Fitur Paket Pro Tanpa Batas", included: true },
+      { label: "Semua Fitur Paket Tani Mandiri Tanpa Batas", included: true },
       { label: "Smart Land & Smoke Scanner (AI Kamera Otomatis)", included: true },
-      { label: "Deteksi Kompos (Kg) & Hemat Pupuk (Rp) dari Foto", included: true },
-      { label: "Pembersih Metadata Lokasi EXIF/GPS Otomatis", included: true },
-      { label: "Bonus +15 Koin Setiap Pemindaian Lahan", included: true },
-      { label: "Prioritas Dukungan Penyuluh & Koperasi Desa", included: true },
+      { label: "Deteksi Kompos (Kg) & Estimasi Hemat Pupuk (Rp) dari Foto", included: true },
+      { label: "Pembersih Metadata Lokasi EXIF/GPS Otomatis (UU PDP)", included: true },
+      { label: "Bonus +35 Benih Hijau Setiap Pemindaian Lahan AI", included: true },
+      { label: "Prioritas Konsultasi Penyuluh & Koperasi Tani Desa", included: true },
     ],
   },
 ];
@@ -104,7 +104,7 @@ export default function PaketPage() {
           Pilih Paket JagaLahan Sesuai Kebutuhan Kebunmu
         </h1>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-          Tanpa jebakan biaya tersembunyi (*no dark patterns*). Setelah masa Trial 14 Hari berakhir,
+          Tanpa jebakan biaya tersembunyi (*no dark patterns*). Setelah masa Perintis Lahan (Trial 30 Hari) berakhir,
           tidak ada pemotongan saldo otomatis tanpa persetujuan eksplisit Anda.
         </p>
       </div>
@@ -212,9 +212,9 @@ export default function PaketPage() {
               Transparansi Langganan & Bebas Jebakan (No Forced Continuity)
             </h3>
             <p className="mt-1 leading-relaxed text-slate-600 dark:text-slate-400">
-              Pengguna Trial 14 Hari tidak diminta memasukkan kartu kredit di awal. Jika masa uji
-              coba selesai dan Anda memilih tidak berlangganan, seluruh data catatan lahan tetap
-              aman dan dapat dilihat kapan saja.
+              Pengguna Perintis Lahan (Trial 30 Hari) tidak diminta memasukkan kartu kredit atau rekening di awal.
+              Jika masa uji coba 30 hari selesai dan Anda memilih tidak berlangganan, seluruh data catatan lahan
+              tetap aman, utuh, dan dapat diakses selamanya.
             </p>
           </div>
         </div>
@@ -226,9 +226,9 @@ export default function PaketPage() {
               Subsidi Silang untuk Koperasi & Kelompok Tani Desa
             </h3>
             <p className="mt-1 leading-relaxed text-slate-600 dark:text-slate-400">
-              Sebagian pendapatan langganan Pro dan VIP dialokasikan kembali ke kas Koin Hijau Desa
-              untuk pengadaan dekomposer EM4, kapur dolomit, dan bibit penutup tanah bagi petani
-              kecil.
+              Sebagian pendapatan langganan Paket Tani Mandiri dan Paket Poktan Cerdas dialokasikan kembali ke
+              kas Benih Hijau Desa untuk subsidi dekomposer hayati EM4, dolomit, bibit sayuran gambut, dan paket tebas
+              bagi pekebun perintis.
             </p>
           </div>
         </div>
